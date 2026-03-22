@@ -350,7 +350,12 @@ function connectSocket(code){
         if(msg.state.gameState&&document.getElementById('game').style.display!=='none'){
           const serverAction=msg.state.gameState.lastAction||0;
           const localAction=gs?gs.lastAction:0;
-          if(serverAction>localAction){gs=msg.state.gameState;render();syncLog();}
+          if(serverAction>localAction){
+            gs=msg.state.gameState;
+            // Update cached room meta so push() stays in sync
+            if(window._roomMeta)window._roomMeta=Object.assign({},msg.state,{gameState:gs});
+            render();syncLog();
+          }
         }
         if(msg.state.status==='playing'&&document.getElementById('waiting').style.display!=='none'){clearInterval(poll);enterGame(msg.state);}
       }
@@ -513,6 +518,8 @@ async function startGame(){
 function enterGame(room){
   if(poll)clearInterval(poll);
   gs=room.gameState;
+  // Cache room metadata for push() to use without needing to re-fetch
+  window._roomMeta={code:room.code,status:room.status,numPlayers:room.numPlayers,players:room.players,gameState:gs,lastUpdate:Date.now()};
   document.getElementById('waiting').style.display='none';
   document.getElementById('game').style.display='flex';
   render();syncLog();
@@ -523,10 +530,13 @@ function enterGame(room){
 }
 async function push(){
   gs.lastAction=Date.now();
-  // Build a minimal room wrapper and save directly — do NOT call loadRoom
-  // as that would trigger onmessage and overwrite gs before the save completes
-  const room={code:roomCode,status:'playing',gameState:gs,lastUpdate:Date.now(),players:gs.players.map(p=>({name:p.name,color:p.color}))};
-  await saveRoom(roomCode,room);
+  // Store the last known room metadata so push() doesn't need to call loadRoom
+  // (calling loadRoom triggers onmessage which overwrites gs mid-save)
+  if(!window._roomMeta) window._roomMeta={};
+  window._roomMeta.gameState=gs;
+  window._roomMeta.lastUpdate=Date.now();
+  window._roomMeta.status='playing';
+  await saveRoom(roomCode,window._roomMeta);
 }
 
 // ── RENDER ──
