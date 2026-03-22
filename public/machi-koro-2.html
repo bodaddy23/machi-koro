@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machi Koro 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dark: #8a6e2a;
+    --ink: #1a1208;
+    --parchment: #f5edd6;
+    --parchment-dark: #e8d9b8;
+    --parchment-mid: #efe3c4;
+    --red-est: #8b2020;
+    --blue-est: #1a3a6b;
+    --green-est: #1a5c2a;
+    --purple-est: #4a1a6b;
+    --bg: #0e0a04;
+    --panel: #1c1408;
+    --panel-border: #3a2a10;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Crimson Pro', Georgia, serif;
+    background: var(--bg);
+    color: var(--parchment);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, .title-font { font-family: 'Cinzel', 'Times New Roman', serif; }
+
+  /* ---- LOBBY ---- */
+  #lobby {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: radial-gradient(ellipse at center, #2a1a06 0%, #0e0a04 70%);
+  }
+  .game-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 700;
+    color: var(--gold);
+    text-align: center;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 40px rgba(201,168,76,0.4);
+    margin-bottom: 0.3rem;
+  }
+  .game-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--gold-dark);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .lobby-card {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: 1rem;
+  }
+  .lobby-card h2 {
+    color: var(--gold);
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.2rem;
+    text-align: center;
+  }
+  input[type=text], input[type=number], select {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    color: var(--parchment);
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    padding: 0.6rem 0.9rem;
+    margin-bottom: 0.8rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus { border-color: var(--gold); }
+  select option { background: #1c1408; }
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--gold-dark);
+    color: var(--parchment);
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    text-align: center;
+  }
+  .btn:hover { background: var(--gold); color: var(--ink); }
+  .btn:active { transform: scale(0.98); }
+  .btn-outline {
+    background: transparent;
+    color: var(--gold);
+    margin-top: 0.5rem;
+  }
+  .btn-outline:hover { background: rgba(201,168,76,0.15); color: var(--gold-light); }
+  .divider { height: 1px; background: var(--panel-border); margin: 1.2rem 0; }
+  .err { color: #e06060; font-size: 0.88rem; margin-bottom: 0.6rem; text-align: center; }
+  .info-text { color: var(--gold-dark); font-size: 0.9rem; text-align: center; margin-top: 0.5rem; }
+
+  /* ---- WAITING ROOM ---- */
+  #waiting { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+  .room-code-box {
+    background: var(--panel);
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .room-code-label { font-size: 0.8rem; letter-spacing: 0.3em; color: var(--gold-dark); text-transform: uppercase; margin-bottom: 0.4rem; }
+  .room-code { font-family: 'Cinzel', serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 0.3em; }
+  .player-list { list-style: none; width: 100%; max-width: 360px; margin-bottom: 1.5rem; }
+  .player-list li {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1rem;
+  }
+  .player-list .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .badge-host { font-size: 0.7rem; background: var(--gold-dark); color: var(--parchment); padding: 1px 6px; border-radius: 4px; margin-left: auto; }
+
+  /* ---- GAME BOARD ---- */
+  #game { display: none; flex-direction: column; min-height: 100vh; }
+  .top-bar {
+    background: var(--panel);
+    border-bottom: 1px solid var(--panel-border);
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .top-bar .game-name { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1rem; flex-shrink: 0; }
+  .players-strip { display: flex; gap: 0.5rem; flex-wrap: wrap; flex: 1; }
+  .player-chip {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: border-color 0.3s;
+  }
+  .player-chip.active { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+  .player-chip.me { font-weight: 600; }
+  .coin-icon { color: var(--gold); font-size: 0.9rem; }
+  .turn-indicator { font-size: 0.8rem; color: var(--gold-dark); flex-shrink: 0; }
+
+  .game-body {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    flex: 1;
+    min-height: 0;
+    gap: 0;
+  }
+  @media (max-width: 750px) {
+    .game-body { grid-template-columns: 1fr; }
+    .side-panel { border-left: none !important; border-top: 1px solid var(--panel-border); }
+  }
+
+  .main-area { padding: 1rem; overflow-y: auto; }
+  .side-panel { background: var(--panel); border-left: 1px solid var(--panel-border); padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+
+  /* ---- MARKET ---- */
+  .section-title {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 0.3rem;
+  }
+  .market-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .est-card {
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1px solid transparent;
+    position: relative;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+  }
+  .est-card:hover { transform: translateY(-2px); }
+  .est-card.buyable { border-color: var(--gold); }
+  .est-card.disabled { opacity: 0.45; cursor: default; pointer-events: none; }
+  .est-card.cant-afford { opacity: 0.6; cursor: default; }
+  .est-red { background: rgba(139,32,32,0.25); border-color: rgba(139,32,32,0.4); }
+  .est-blue { background: rgba(26,58,107,0.3); border-color: rgba(26,58,107,0.4); }
+  .est-green { background: rgba(26,92,42,0.25); border-color: rgba(26,92,42,0.4); }
+  .est-purple { background: rgba(74,26,107,0.25); border-color: rgba(74,26,107,0.4); }
+  .est-card .card-roll { font-size: 0.65rem; color: var(--gold-dark); }
+  .est-card .card-name { font-size: 0.72rem; font-weight: 600; color: var(--parchment); flex: 1; margin: 2px 0; line-height: 1.2; }
+  .est-card .card-effect { font-size: 0.62rem; color: var(--parchment-dark); line-height: 1.2; }
+  .est-card .card-cost { font-size: 0.7rem; color: var(--gold); margin-top: auto; font-weight: 600; }
+  .est-card .card-count { position: absolute; top: 3px; right: 5px; font-size: 0.65rem; background: var(--gold-dark); color: var(--parchment); border-radius: 8px; padding: 1px 5px; }
+  .color-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 3px; }
+  .dot-red { background: #e05050; }
+  .dot-blue { background: #6090e0; }
+  .dot-green { background: #50c050; }
+  .dot-purple { background: #a060e0; }
+
+  /* ---- LANDMARKS ---- */
+  .landmark-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+  .landmark-card {
+    border-radius: 8px;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--panel-border);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .landmark-card.built { background: rgba(201,168,76,0.12); border-color: var(--gold); }
+  .landmark-card.buildable:not(.built) { border-color: var(--gold-dark); cursor: pointer; }
+  .landmark-card .lm-name { font-size: 0.75rem; font-weight: 600; color: var(--parchment); }
+  .landmark-card .lm-cost { font-size: 0.7rem; color: var(--gold); }
+  .landmark-card .lm-desc { font-size: 0.62rem; color: var(--parchment-dark); margin-top: 2px; line-height: 1.2; }
+  .landmark-card .lm-status { font-size: 0.62rem; margin-top: 2px; }
+  .landmark-card.built .lm-status { color: #70c070; }
+  .landmark-card:not(.built) .lm-status { color: var(--gold-dark); }
+
+  /* ---- DICE ---- */
+  .dice-area { text-align: center; margin-bottom: 1rem; }
+  .dice-row { display: flex; gap: 1rem; justify-content: center; margin: 0.8rem 0; }
+  .die {
+    width: 52px; height: 52px;
+    background: var(--parchment);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink);
+    border: 2px solid var(--gold-dark);
+    transition: transform 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+  .die.rolling { animation: roll 0.6s ease; }
+  @keyframes roll {
+    0%,100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-15deg) scale(1.1); }
+    75% { transform: rotate(15deg) scale(1.1); }
+  }
+  .die.empty { opacity: 0.3; }
+  .dice-total { font-size: 1.1rem; color: var(--gold); font-family: 'Cinzel', serif; }
+  .dice-info { font-size: 0.85rem; color: var(--parchment-dark); margin-top: 0.3rem; }
+
+  /* ---- ACTIONS ---- */
+  .action-row { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+  .action-btn {
+    background: var(--gold-dark);
+    color: var(--parchment);
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    padding: 0.5rem 1.2rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .action-btn:hover { background: var(--gold); color: var(--ink); }
+  .action-btn:disabled { opacity: 0.4; cursor: default; }
+  .action-btn.secondary { background: transparent; color: var(--gold); }
+  .action-btn.secondary:hover { background: rgba(201,168,76,0.15); }
+
+  /* ---- LOG ---- */
+  .log-area { flex: 1; min-height: 80px; }
+  .log-entries { font-size: 0.82rem; line-height: 1.7; color: var(--parchment-dark); max-height: 200px; overflow-y: auto; }
+  .log-entries .log-you { color: var(--gold-light); }
+  .log-entries .log-system { color: var(--gold-dark); font-style: italic; }
+
+  /* ---- MODAL ---- */
+  .modal-bg {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 100;
+    align-items: center; justify-content: center;
+    padding: 1rem;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    padding: 1.5rem;
+    max-width: 400px;
+    width: 100%;
+  }
+  .modal h2 { font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 1rem; font-size: 1.1rem; }
+  .modal p { font-size: 0.95rem; color: var(--parchment-dark); margin-bottom: 1rem; line-height: 1.6; }
+  .modal .btn { margin-top: 0.5rem; }
+
+  /* ---- LOADING ---- */
+  .loading-text { color: var(--gold-dark); font-style: italic; font-size: 0.9rem; text-align: center; padding: 0.5rem; }
+
+  /* ---- YOUR ESTABLISHMENTS ---- */
+  .my-est-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .my-est-pill {
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 0.72rem;
+    border: 1px solid var(--panel-border);
+  }
+  .my-est-pill.red { border-color: rgba(139,32,32,0.6); }
+  .my-est-pill.blue { border-color: rgba(26,58,107,0.6); }
+  .my-est-pill.green { border-color: rgba(26,92,42,0.6); }
+  .my-est-pill.purple { border-color: rgba(74,26,107,0.6); }
+
+  /* ---- WINNER ---- */
+  #winner-screen {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 200;
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+  }
+  .winner-crown { font-size: 4rem; margin-bottom: 1rem; }
+  .winner-name { font-family: 'Cinzel', serif; font-size: 2rem; color: var(--gold); margin-bottom: 0.5rem; }
+  .winner-sub { color: var(--parchment-dark); margin-bottom: 2rem; }
+</style>
+</head>
+<body>
+
+<!-- LOBBY -->
+<div id="lobby">
+  <div class="game-title">Machi Koro 2</div>
+  <div class="game-subtitle">Build your city</div>
+
+  <div class="lobby-card">
+    <h2>Create a Game</h2>
+    <input type="text" id="host-name" placeholder="Your name" maxlength="20" />
+    <select id="num-players">
+      <option value="2">2 Players</option>
+      <option value="3">3 Players</option>
+      <option value="4" selected>4 Players</option>
+    </select>
+    <div id="host-err" class="err" style="display:none"></div>
+    <button class="btn" onclick="hostGame()">Create Room</button>
+  </div>
+
+  <div class="lobby-card">
+    <h2>Join a Game</h2>
+    <input type="text" id="join-name" placeholder="Your name" maxlength="20" />
+    <input type="text" id="join-code" placeholder="Room code (e.g. ABCD)" maxlength="6" style="text-transform:uppercase;letter-spacing:0.2em;" />
+    <div id="join-err" class="err" style="display:none"></div>
+    <button class="btn btn-outline" onclick="joinGame()">Join Room</button>
+  </div>
+</div>
+
+<!-- WAITING ROOM -->
+<div id="waiting" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;">
+  <div class="game-title" style="font-size:1.8rem;margin-bottom:0.5rem;">Waiting for players...</div>
+  <div class="room-code-box" style="margin-top:1.5rem;">
+    <div class="room-code-label">Room Code</div>
+    <div class="room-code" id="display-code">----</div>
+    <div style="font-size:0.8rem;color:var(--gold-dark);margin-top:0.5rem;">Share this with friends</div>
+  </div>
+  <ul class="player-list" id="waiting-players"></ul>
+  <div id="start-game-area" style="width:100%;max-width:360px;display:none;">
+    <button class="btn" onclick="startGame()">Start Game</button>
+  </div>
+  <div id="waiting-status" class="info-text">Waiting for more players to join...</div>
+</div>
+
+<!-- GAME BOARD -->
+<div id="game" style="display:none;flex-direction:column;min-height:100vh;">
+  <div class="top-bar">
+    <div class="game-name">Machi Koro 2</div>
+    <div class="players-strip" id="players-strip"></div>
+    <div class="turn-indicator" id="turn-indicator"></div>
+  </div>
+  <div class="game-body">
+    <div class="main-area">
+      <!-- Dice -->
+      <div class="section-title">Dice Roll</div>
+      <div class="dice-area" id="dice-area">
+        <div class="dice-row" id="dice-row">
+          <div class="die empty" id="die1">?</div>
+          <div class="die empty" id="die2">?</div>
+        </div>
+        <div class="dice-total" id="dice-total"></div>
+        <div class="dice-info" id="dice-info"></div>
+        <div class="action-row" style="margin-top:0.8rem;" id="action-btns">
+          <button class="action-btn" id="btn-roll1" onclick="rollDice(1)">Roll 1 Die</button>
+          <button class="action-btn secondary" id="btn-roll2" onclick="rollDice(2)">Roll 2 Dice</button>
+        </div>
+        <div id="post-roll-actions" class="action-row" style="margin-top:0.8rem;display:none;">
+          <button class="action-btn" onclick="endTurn()">End Turn</button>
+        </div>
+      </div>
+
+      <!-- Market -->
+      <div class="section-title" style="margin-top:1rem;">Market</div>
+      <div id="market-grid" class="market-grid"></div>
+
+      <!-- Landmarks -->
+      <div class="section-title">Landmarks (Build to Win)</div>
+      <div id="my-landmarks" class="landmark-grid"></div>
+    </div>
+
+    <!-- Side panel -->
+    <div class="side-panel">
+      <div>
+        <div class="section-title">Your Establishments</div>
+        <div id="my-establishments" class="my-est-grid"></div>
+      </div>
+      <div>
+        <div class="section-title">Other Players' Cities</div>
+        <div id="other-players-info"></div>
+      </div>
+      <div class="log-area">
+        <div class="section-title">Game Log</div>
+        <div class="log-entries" id="log-entries"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Winner screen -->
+<div id="winner-screen">
+  <div class="winner-crown">👑</div>
+  <div class="winner-name" id="winner-name"></div>
+  <div class="winner-sub">has built all their landmarks and won Machi Koro 2!</div>
+  <button class="btn" style="max-width:240px;margin:0 auto;" onclick="location.reload()">Play Again</button>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h2 id="modal-title">Notice</h2>
+    <p id="modal-body"></p>
+    <button class="btn" onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// MACHI KORO 2 — Full Game Implementation
+// ============================================================
+
+const STORAGE_PREFIX = 'mk2_';
+const POLL_INTERVAL = 2000;
+
+// --- GAME DATA ---
+const ESTABLISHMENTS = [
+  // [id, name, color, activation, cost, effect_desc, income_fn]
+  { id:'wheat',   name:'Wheat Field',   color:'blue',   roll:[1],     cost:1,  desc:'Get 1 coin from bank', count:0 },
+  { id:'ranch',   name:'Ranch',         color:'blue',   roll:[2],     cost:1,  desc:'Get 1 coin from bank', count:0 },
+  { id:'forest',  name:'Forest',        color:'blue',   roll:[5],     cost:3,  desc:'Get 1 coin from bank', count:0 },
+  { id:'mine',    name:'Mine',          color:'blue',   roll:[9],     cost:6,  desc:'Get 5 coins from bank', count:0 },
+  { id:'appletv', name:'Apple Orchard', color:'blue',   roll:[10],    cost:3,  desc:'Get 3 coins from bank', count:0 },
+  { id:'fruitvg', name:'Fruit & Veg.',  color:'green',  roll:[11,12], cost:2,  desc:'+1 coin/Wheat Field or Ranch you own', count:0 },
+  { id:'bakery',  name:'Bakery',        color:'green',  roll:[2,3],   cost:1,  desc:'Get 1 coin from bank', count:0 },
+  { id:'conveni', name:'Convenience',   color:'green',  roll:[4],     cost:2,  desc:'Get 3 coins from bank', count:0 },
+  { id:'cafe',    name:'Café',          color:'red',    roll:[3],     cost:2,  desc:'Take 1 coin from current player', count:0 },
+  { id:'restaurant',name:'Restaurant',  color:'red',    roll:[9,10],  cost:3,  desc:'Take 2 coins from current player', count:0 },
+  { id:'stadium', name:'Stadium',       color:'purple', roll:[6],     cost:6,  desc:'Take 2 coins from each player', count:0 },
+  { id:'tvstation',name:'TV Station',   color:'purple', roll:[6],     cost:7,  desc:'Take 5 coins from one player', count:0 },
+  { id:'bizcenter',name:'Biz. Center',  color:'purple', roll:[6],     cost:8,  desc:'Swap 1 establishment with a player', count:0 },
+  { id:'cheesefc',name:'Cheese Factory',color:'green',  roll:[7],     cost:5,  desc:'+3 coins/Ranch you own', count:0 },
+  { id:'furnitfc',name:'Furniture Fac.',color:'green',  roll:[8],     cost:3,  desc:'+3 coins/Forest or Mine you own', count:0 },
+];
+
+const LANDMARKS = [
+  { id:'city_hall',   name:'City Hall',     cost:0,  desc:'If you have 0 coins at start of turn, get 1 coin', built_start:true },
+  { id:'harbor',      name:'Harbor',        cost:2,  desc:'When rolling for 10+, add 2 to total', built_start:false },
+  { id:'train_stn',   name:'Train Station', cost:4,  desc:'May roll 1 or 2 dice', built_start:false },
+  { id:'shopping',    name:'Shopping Mall', cost:10, desc:'+1 coin to each Green/Red establishment activation', built_start:false },
+  { id:'amusement',   name:'Amusement Pk.', cost:16, desc:'If doubles rolled, take another turn', built_start:false },
+  { id:'radio_tower', name:'Radio Tower',   cost:22, desc:'Once per turn, may re-roll all dice', built_start:false },
+  { id:'airport',     name:'Airport',       cost:30, desc:'If you build nothing on your turn, get 10 coins', built_start:false },
+];
+
+// --- STATE ---
+let myName = '';
+let roomCode = '';
+let isHost = false;
+let gameState = null;
+let pollTimer = null;
+let rolledThisTurn = false;
+let diceValues = [];
+let rerolledThisTurn = false;
+let extraTurnUsed = false;
+let boughtThisTurn = false;
+let pendingTVStation = false;
+let pendingBizCenter = false;
+
+// --- STORAGE HELPERS ---
+let socket = null;
+let pendingResolvers = {};
+
+function connectSocket(code) {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  socket = new WebSocket(`${proto}://${location.host}`);
+
+  socket.onopen = () => {
+    socket.send(JSON.stringify({ type: 'join', code }));
+  };
+
+  socket.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.type === 'state' && msg.state) {
+      // Resolve any pending loadRoom calls
+      Object.values(pendingResolvers).forEach(resolve => resolve(msg.state));
+      pendingResolvers = {};
+
+      // Also update game state live if in-game
+      if (msg.state.gameState && document.getElementById('game').style.display !== 'none') {
+        gameState = msg.state.gameState;
+        renderGame();
+      }
+    }
+  };
+}
+
+async function saveRoom(code, data) {
+  if (!socket || socket.readyState !== 1) connectSocket(code);
+  socket.send(JSON.stringify({ type: 'update', state: data }));
+}
+
+async function loadRoom(code) {
+  return new Promise((resolve) => {
+    if (!socket || socket.readyState !== 1) {
+      connectSocket(code);
+      // Wait briefly for connection + state delivery
+      setTimeout(() => resolve(null), 500);
+      return;
+    }
+    // Request latest state — server will broadcast it back
+    const id = Date.now();
+    pendingResolvers[id] = resolve;
+    socket.send(JSON.stringify({ type: 'join', code })); // re-join triggers a state push
+    setTimeout(() => { delete pendingResolvers[id]; resolve(null); }, 2000);
+  });
+}
+// --- UTILS ---
+function genCode() {
+  return Math.random().toString(36).substring(2,6).toUpperCase();
+}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+function log(msg, type='') {
+  const el = document.getElementById('log-entries');
+  const div = document.createElement('div');
+  div.className = type ? 'log-'+type : '';
+  div.textContent = msg;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+function showModal(title, body) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  document.getElementById('modal-bg').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('show');
+}
+
+// --- LOBBY ---
+async function hostGame() {
+  const name = document.getElementById('host-name').value.trim();
+  if (!name) return showErr('host-err','Enter your name');
+  const np = parseInt(document.getElementById('num-players').value);
+  myName = name;
+  isHost = true;
+  roomCode = genCode();
+  connectSocket(roomCode);
+  const room = {
+    code: roomCode,
+    status: 'waiting',
+    numPlayers: np,
+    players: [{ name, coins: 3, establishments: initEstablishments(), landmarks: initLandmarks(), isHost: true }],
+    gameState: null,
+    lastUpdate: Date.now(),
+  };
+  await saveRoom(roomCode, room);
+  showWaiting(room);
+}
+
+async function joinGame() {
+  const name = document.getElementById('join-name').value.trim();
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  if (!name) return showErr('join-err','Enter your name');
+  if (code.length < 4) return showErr('join-err','Enter a valid room code');
+  const room = await loadRoom(code);
+  if (!room) return showErr('join-err','Room not found');
+  if (room.status !== 'waiting') return showErr('join-err','Game already started');
+  if (room.players.length >= room.numPlayers) return showErr('join-err','Room is full');
+  if (room.players.find(p => p.name === name)) return showErr('join-err','Name taken');
+  myName = name; isHost = false; roomCode = code;
+  connectSocket(roomCode);
+  room.players.push({ name, coins: 3, establishments: initEstablishments(), landmarks: initLandmarks(), isHost: false });
+  room.lastUpdate = Date.now();
+  await saveRoom(code, room);
+  showWaiting(room);
+}
+
+function initEstablishments() {
+  // Each player starts with: Wheat Field(1) and Bakery(1)
+  const owned = {};
+  owned['wheat'] = 1;
+  owned['bakery'] = 1;
+  return owned;
+}
+
+function initLandmarks() {
+  const lm = {};
+  LANDMARKS.forEach(l => { lm[l.id] = l.built_start ? true : false; });
+  return lm;
+}
+
+function showWaiting(room) {
+  document.getElementById('lobby').style.display = 'none';
+  document.getElementById('waiting').style.display = 'flex';
+  document.getElementById('display-code').textContent = roomCode;
+  updateWaitingList(room);
+  startWaitingPoll();
+}
+
+function updateWaitingList(room) {
+  const ul = document.getElementById('waiting-players');
+  ul.innerHTML = room.players.map((p,i) =>
+    `<li><span class="dot"></span>${p.name}${p.isHost ? '<span class="badge-host">HOST</span>':''}</li>`
+  ).join('');
+  const need = room.numPlayers - room.players.length;
+  document.getElementById('waiting-status').textContent = need > 0
+    ? `Waiting for ${need} more player${need>1?'s':''}...`
+    : 'All players joined!';
+  const startArea = document.getElementById('start-game-area');
+  if (isHost && room.players.length >= 2) {
+    startArea.style.display = 'block';
+  } else {
+    startArea.style.display = 'none';
+  }
+}
+
+function startWaitingPoll() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    const room = await loadRoom(roomCode);
+    if (!room) return;
+    if (room.status === 'playing') {
+      clearInterval(pollTimer);
+      enterGame(room);
+      return;
+    }
+    updateWaitingList(room);
+  }, POLL_INTERVAL);
+}
+
+async function startGame() {
+  const room = await loadRoom(roomCode);
+  if (!room) return;
+  // Build initial market (6 unique establishments available)
+  const shuffled = [...ESTABLISHMENTS].sort(()=>Math.random()-0.5);
+  const market = shuffled.slice(0,6).reduce((acc, e) => { acc[e.id] = 6; return acc; }, {});
+  const gs = {
+    players: room.players,
+    market,
+    currentPlayerIdx: 0,
+    turnPhase: 'roll', // roll | buy | end
+    log: [],
+    lastAction: Date.now(),
+  };
+  room.status = 'playing';
+  room.gameState = gs;
+  room.lastUpdate = Date.now();
+  await saveRoom(roomCode, room);
+  enterGame(room);
+}
+
+// --- ENTER GAME ---
+function enterGame(room) {
+  if (pollTimer) clearInterval(pollTimer);
+  gameState = room.gameState;
+  document.getElementById('waiting').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+  renderGame();
+  startGamePoll();
+}
+
+function myPlayerIdx() {
+  return gameState.players.findIndex(p => p.name === myName);
+}
+function myPlayer() {
+  return gameState.players[myPlayerIdx()];
+}
+function isMyTurn() {
+  return gameState.currentPlayerIdx === myPlayerIdx();
+}
+
+function startGamePoll() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    const room = await loadRoom(roomCode);
+    if (!room || !room.gameState) return;
+    const newGs = room.gameState;
+    if (newGs.lastAction !== (gameState ? gameState.lastAction : 0)) {
+      gameState = newGs;
+      renderGame();
+      // sync log
+      const logEl = document.getElementById('log-entries');
+      logEl.innerHTML = '';
+      (gameState.log || []).forEach(entry => {
+        const d = document.createElement('div');
+        d.textContent = entry.msg;
+        if (entry.player === myName) d.className = 'log-you';
+        if (!entry.player) d.className = 'log-system';
+        logEl.appendChild(d);
+      });
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+  }, POLL_INTERVAL);
+}
+
+// --- RENDER ---
+function renderGame() {
+  if (!gameState) return;
+  const me = myPlayer();
+  const curPlayer = gameState.players[gameState.currentPlayerIdx];
+
+  // Top bar
+  const strip = document.getElementById('players-strip');
+  strip.innerHTML = gameState.players.map((p,i) => {
+    const active = i === gameState.currentPlayerIdx;
+    const isMe = p.name === myName;
+    return `<div class="player-chip${active?' active':''}${isMe?' me':''}">
+      <span class="coin-icon">◆</span>${p.name}: ${p.coins}
+    </div>`;
+  }).join('');
+  document.getElementById('turn-indicator').textContent =
+    isMyTurn() ? '⭐ Your Turn' : `${curPlayer.name}'s Turn`;
+
+  // Dice area
+  const phase = gameState.turnPhase || 'roll';
+  renderDiceArea(phase, me);
+
+  // Market
+  renderMarket(me, phase);
+
+  // My landmarks
+  renderLandmarks(me, phase);
+
+  // My establishments
+  renderMyEstablishments(me);
+
+  // Other players
+  renderOtherPlayers();
+}
+
+function renderDiceArea(phase, me) {
+  const hasTrainStation = me.landmarks['train_stn'];
+  const roll1 = document.getElementById('btn-roll1');
+  const roll2 = document.getElementById('btn-roll2');
+  const postRoll = document.getElementById('post-roll-actions');
+  const actionBtns = document.getElementById('action-btns');
+
+  if (!isMyTurn()) {
+    actionBtns.style.display = 'none';
+    postRoll.style.display = 'none';
+    // show dice if available
+    if (gameState.lastDice) {
+      showDice(gameState.lastDice, false);
+    }
+    return;
+  }
+
+  if (phase === 'roll') {
+    actionBtns.style.display = 'flex';
+    postRoll.style.display = 'none';
+    roll1.disabled = false;
+    roll2.disabled = !hasTrainStation;
+    roll2.title = hasTrainStation ? '' : 'Build Train Station to roll 2 dice';
+    document.getElementById('dice-total').textContent = '';
+    document.getElementById('dice-info').textContent = hasTrainStation ? 'Choose 1 or 2 dice' : 'Roll 1 die';
+    if (!gameState.lastDice) {
+      document.getElementById('die1').textContent = '?';
+      document.getElementById('die1').className = 'die empty';
+      document.getElementById('die2').textContent = '?';
+      document.getElementById('die2').className = 'die empty';
+    }
+  } else if (phase === 'buy') {
+    actionBtns.style.display = 'none';
+    postRoll.style.display = 'flex';
+    if (gameState.lastDice) showDice(gameState.lastDice, false);
+  }
+}
+
+function showDice(dice, animate) {
+  const d1 = document.getElementById('die1');
+  const d2 = document.getElementById('die2');
+  if (animate) {
+    d1.className = 'die rolling'; d2.className = 'die rolling';
+    setTimeout(() => {
+      d1.className = 'die'; d2.className = dice.length > 1 ? 'die' : 'die empty';
+      d1.textContent = dice[0];
+      d2.textContent = dice.length > 1 ? dice[1] : '·';
+    }, 600);
+  } else {
+    d1.className = 'die'; d1.textContent = dice[0];
+    d2.className = dice.length > 1 ? 'die' : 'die empty';
+    d2.textContent = dice.length > 1 ? dice[1] : '·';
+  }
+  const total = dice.reduce((a,b)=>a+b,0);
+  document.getElementById('dice-total').textContent = `Total: ${total}`;
+}
+
+function renderMarket(me, phase) {
+  const grid = document.getElementById('market-grid');
+  grid.innerHTML = '';
+  const market = gameState.market || {};
+  Object.keys(market).forEach(eid => {
+    const count = market[eid];
+    if (count <= 0) return;
+    const est = ESTABLISHMENTS.find(e => e.id === eid);
+    if (!est) return;
+    const canBuy = isMyTurn() && phase === 'buy' && me.coins >= est.cost && !boughtThisTurn;
+    const div = document.createElement('div');
+    div.className = `est-card est-${est.color}${canBuy?' buyable':''}${!isMyTurn()||phase!=='buy'?'':!canBuy?' cant-afford':''}`;
+    div.innerHTML = `
+      <span class="card-roll">[${est.roll.join('-')}]</span>
+      <div class="card-name"><span class="color-dot dot-${est.color}"></span>${est.name}</div>
+      <div class="card-effect">${est.desc}</div>
+      <div class="card-cost">◆ ${est.cost}</div>
+      <span class="card-count">×${count}</span>
+    `;
+    if (canBuy) div.onclick = () => buyEstablishment(eid, est.cost);
+    grid.appendChild(div);
+  });
+  if (grid.innerHTML === '') grid.innerHTML = '<div style="color:var(--gold-dark);font-size:0.85rem;">Market is empty.</div>';
+}
+
+function renderLandmarks(me, phase) {
+  const grid = document.getElementById('my-landmarks');
+  grid.innerHTML = '';
+  LANDMARKS.forEach(lm => {
+    if (lm.built_start) return;
+    const built = me.landmarks[lm.id];
+    const canBuild = isMyTurn() && phase === 'buy' && !built && me.coins >= lm.cost && !boughtThisTurn;
+    const div = document.createElement('div');
+    div.className = `landmark-card${built?' built':''}${canBuild?' buildable':''}`;
+    div.innerHTML = `
+      <div class="lm-name">${lm.name}</div>
+      <div class="lm-cost">◆ ${lm.cost}</div>
+      <div class="lm-desc">${lm.desc}</div>
+      <div class="lm-status">${built ? '✓ Built' : `Cost: ${lm.cost} coins`}</div>
+    `;
+    if (canBuild) div.onclick = () => buildLandmark(lm.id, lm.cost);
+    grid.appendChild(div);
+  });
+}
+
+function renderMyEstablishments(me) {
+  const grid = document.getElementById('my-establishments');
+  grid.innerHTML = '';
+  const owned = me.establishments || {};
+  if (Object.keys(owned).length === 0) {
+    grid.innerHTML = '<span style="color:var(--gold-dark);font-size:0.85rem;">None</span>';
+    return;
+  }
+  Object.keys(owned).forEach(eid => {
+    const cnt = owned[eid];
+    if (!cnt) return;
+    const est = ESTABLISHMENTS.find(e => e.id === eid);
+    if (!est) return;
+    const span = document.createElement('span');
+    span.className = `my-est-pill ${est.color}`;
+    span.textContent = `${est.name} ×${cnt}`;
+    grid.appendChild(span);
+  });
+}
+
+function renderOtherPlayers() {
+  const div = document.getElementById('other-players-info');
+  div.innerHTML = '';
+  gameState.players.forEach((p,i) => {
+    if (p.name === myName) return;
+    const lmBuilt = LANDMARKS.filter(lm => !lm.built_start && p.landmarks[lm.id]).length;
+    const lmTotal = LANDMARKS.filter(lm => !lm.built_start).length;
+    const d = document.createElement('div');
+    d.style.cssText = 'margin-bottom:0.7rem;';
+    d.innerHTML = `<div style="font-size:0.82rem;color:var(--gold-light);font-weight:600;">${p.name} ${i===gameState.currentPlayerIdx?'⭐':''}</div>
+      <div style="font-size:0.75rem;color:var(--parchment-dark);">◆ ${p.coins} coins · ${lmBuilt}/${lmTotal} landmarks</div>`;
+    div.appendChild(d);
+  });
+}
+
+// --- ACTIONS ---
+async function rollDice(numDice) {
+  if (!isMyTurn()) return;
+  const me = myPlayer();
+  const dice = [];
+  for (let i = 0; i < numDice; i++) dice.push(Math.floor(Math.random()*6)+1);
+
+  // Harbor: if total >= 10 and player has harbor, add 2
+  let total = dice.reduce((a,b)=>a+b,0);
+  if (me.landmarks['harbor'] && total >= 10) total += 2;
+
+  showDice(dice, true);
+  diceValues = dice;
+
+  // Apply income effects
+  const logEntries = applyDiceEffects(dice, total);
+
+  // Check amusement park (re-roll on doubles)
+  const doubles = numDice === 2 && dice[0] === dice[1];
+
+  gameState.lastDice = dice;
+  gameState.lastDiceTotal = total;
+  gameState.turnPhase = 'buy';
+  gameState.lastAction = Date.now();
+
+  // City Hall: if 0 coins, get 1
+  if (me.coins === 0 && me.landmarks['city_hall']) {
+    me.coins += 1;
+    logEntries.push({ msg: `${myName}: City Hall gives 1 coin.`, player: myName });
+  }
+
+  logEntries.forEach(e => gameState.log.push(e));
+  gameState.log.push({ msg: `${myName} rolled [${dice.join('+')}] = ${total}`, player: myName });
+
+  await pushGameState();
+  renderGame();
+
+  // After render, offer re-roll if radio tower
+  if (me.landmarks['radio_tower'] && !rerolledThisTurn) {
+    setTimeout(() => {
+      if (confirm('Use Radio Tower to re-roll?')) {
+        rerolledThisTurn = true;
+        gameState.turnPhase = 'roll';
+        gameState.lastDice = null;
+        renderGame();
+      }
+    }, 800);
+  }
+
+  // Amusement park doubles notification
+  if (doubles && me.landmarks['amusement'] && !extraTurnUsed) {
+    setTimeout(() => showModal('Amusement Park!', 'You rolled doubles! You get an extra turn after this one.'), 900);
+  }
+}
+
+function applyDiceEffects(dice, total) {
+  const entries = [];
+  const players = gameState.players;
+  const curIdx = gameState.currentPlayerIdx;
+  const cur = players[curIdx];
+
+  // Process establishments in order: red (other players) → green/blue (everyone or you) → purple (current player)
+  // Red cards — activated when it's someone ELSE's turn
+  players.forEach((p, pi) => {
+    if (pi === curIdx) return;
+    ['cafe','restaurant'].forEach(eid => {
+      const cnt = p.establishments[eid] || 0;
+      if (!cnt) return;
+      const est = ESTABLISHMENTS.find(e => e.id === eid);
+      if (!est.roll.includes(total)) return;
+      let take = eid === 'cafe' ? 1 : 2;
+      if (cur.landmarks['shopping']) take += 1;
+      const actual = Math.min(take * cnt, cur.coins);
+      cur.coins -= actual;
+      p.coins += actual;
+      entries.push({ msg: `${p.name}'s ${est.name}: took ${actual} coin(s) from ${cur.name}`, player: p.name });
+    });
+  });
+
+  // Blue cards — activated for ALL players
+  players.forEach((p, pi) => {
+    ['wheat','ranch','forest','mine','appletv'].forEach(eid => {
+      const cnt = p.establishments[eid] || 0;
+      if (!cnt) return;
+      const est = ESTABLISHMENTS.find(e => e.id === eid);
+      if (!est.roll.includes(total)) return;
+      let income = eid==='mine'?5 : eid==='appletv'?3 : 1;
+      p.coins += income * cnt;
+      entries.push({ msg: `${p.name}'s ${est.name} (×${cnt}): +${income*cnt} coin(s)`, player: p.name });
+    });
+  });
+
+  // Green cards — only current player
+  ['bakery','conveni','fruitvg','cheesefc','furnitfc'].forEach(eid => {
+    const cnt = cur.establishments[eid] || 0;
+    if (!cnt) return;
+    const est = ESTABLISHMENTS.find(e => e.id === eid);
+    if (!est.roll.includes(total)) return;
+    let income = 0;
+    if (eid === 'bakery') income = 1;
+    else if (eid === 'conveni') income = 3;
+    else if (eid === 'fruitvg') {
+      const wf = cur.establishments['wheat']||0;
+      const rn = cur.establishments['ranch']||0;
+      income = (wf + rn);
+    }
+    else if (eid === 'cheesefc') income = 3 * (cur.establishments['ranch']||0);
+    else if (eid === 'furnitfc') income = 3 * ((cur.establishments['forest']||0)+(cur.establishments['mine']||0));
+    if (cur.landmarks['shopping']) income += cnt;
+    cur.coins += income * cnt;
+    entries.push({ msg: `${cur.name}'s ${est.name} (×${cnt}): +${income*cnt} coin(s)`, player: cur.name });
+  });
+
+  // Purple — only current player, affects others
+  ['stadium','tvstation','bizcentr'].forEach(eid => {
+    const cnt = cur.establishments[eid] || 0;
+    if (!cnt) return;
+    const est = ESTABLISHMENTS.find(e => e.id === eid);
+    if (!est.roll.includes(total)) return;
+    if (eid === 'stadium') {
+      let total_take = 0;
+      players.forEach((p,pi) => {
+        if (pi===curIdx) return;
+        const take = Math.min(2, p.coins);
+        p.coins -= take; cur.coins += take; total_take += take;
+      });
+      entries.push({ msg: `${cur.name}'s Stadium: took 2 coins from each player (total ${total_take})`, player: cur.name });
+    }
+    // TV station and Biz Center require player interaction — handled separately
+  });
+
+  return entries;
+}
+
+async function buyEstablishment(eid, cost) {
+  if (!isMyTurn() || boughtThisTurn) return;
+  const me = myPlayer();
+  if (me.coins < cost) return;
+  me.coins -= cost;
+  me.establishments[eid] = (me.establishments[eid] || 0) + 1;
+  gameState.market[eid] = Math.max(0, (gameState.market[eid]||0) - 1);
+  boughtThisTurn = true;
+  gameState.log.push({ msg: `${myName} bought ${ESTABLISHMENTS.find(e=>e.id===eid).name} for ${cost} coins`, player: myName });
+  gameState.lastAction = Date.now();
+  await pushGameState();
+  renderGame();
+}
+
+async function buildLandmark(lid, cost) {
+  if (!isMyTurn() || boughtThisTurn) return;
+  const me = myPlayer();
+  if (me.coins < cost || me.landmarks[lid]) return;
+  me.coins -= cost;
+  me.landmarks[lid] = true;
+  boughtThisTurn = true;
+  gameState.log.push({ msg: `${myName} built the ${LANDMARKS.find(l=>l.id===lid).name}!`, player: myName });
+  gameState.lastAction = Date.now();
+
+  // Check win condition
+  const lmToBuild = LANDMARKS.filter(l => !l.built_start);
+  const allBuilt = lmToBuild.every(l => me.landmarks[l.id]);
+  if (allBuilt) {
+    gameState.winner = myName;
+    gameState.log.push({ msg: `🏆 ${myName} has built all landmarks and WINS!` });
+    gameState.lastAction = Date.now();
+    await pushGameState();
+    showWinner(myName);
+    return;
+  }
+
+  await pushGameState();
+  renderGame();
+}
+
+async function endTurn() {
+  if (!isMyTurn()) return;
+  const me = myPlayer();
+
+  // Airport: if built nothing, get 10 coins
+  if (me.landmarks['airport'] && !boughtThisTurn) {
+    me.coins += 10;
+    gameState.log.push({ msg: `${myName}: Airport gives 10 coins for not building.`, player: myName });
+  }
+
+  // Amusement park: if doubles and not used extra turn
+  const dice = gameState.lastDice || [];
+  const doubles = dice.length === 2 && dice[0] === dice[1];
+  if (doubles && me.landmarks['amusement'] && !extraTurnUsed) {
+    extraTurnUsed = true;
+    gameState.turnPhase = 'roll';
+    gameState.lastDice = null;
+    gameState.log.push({ msg: `${myName} gets an extra turn (Amusement Park)!`, player: myName });
+    gameState.lastAction = Date.now();
+    boughtThisTurn = false;
+    await pushGameState();
+    renderGame();
+    return;
+  }
+
+  // Advance to next player
+  const next = (gameState.currentPlayerIdx + 1) % gameState.players.length;
+  gameState.currentPlayerIdx = next;
+  gameState.turnPhase = 'roll';
+  gameState.lastDice = null;
+  gameState.log.push({ msg: `--- ${gameState.players[next].name}'s turn ---` });
+  gameState.lastAction = Date.now();
+  boughtThisTurn = false; rerolledThisTurn = false; extraTurnUsed = false;
+  await pushGameState();
+  renderGame();
+}
+
+async function pushGameState() {
+  const room = await loadRoom(roomCode);
+  if (!room) return;
+  room.gameState = gameState;
+  room.lastUpdate = Date.now();
+  await saveRoom(roomCode, room);
+}
+
+function showWinner(name) {
+  document.getElementById('winner-name').textContent = name;
+  document.getElementById('winner-screen').style.display = 'flex';
+}
+
+// Check for winner when rendering
+function checkWinner() {
+  if (gameState && gameState.winner) {
+    showWinner(gameState.winner);
+  }
+}
+
+// Patch renderGame to check winner
+const _origRenderGame = renderGame;
+window.renderGame = function() {
+  _origRenderGame();
+  checkWinner();
+}
+</script>
+</body>
+</html>
