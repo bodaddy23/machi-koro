@@ -106,7 +106,7 @@ select option{background:#fff;}
 .ceff{font-size:.74rem;color:var(--mid);line-height:1.35;}
 .ccost{font-size:1rem;font-weight:800;color:var(--sky-dark);margin-top:auto;}
 .ccount{position:absolute;top:5px;right:7px;font-size:.72rem;background:var(--sky);color:#fff;border-radius:10px;padding:1px 7px;font-weight:800;}
-.tdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;vertical-align:middle;}
+.tdot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:4px;vertical-align:middle;}
 .td-blue{background:#3a8fd4;}.td-green{background:#2eb872;}.td-red{background:#e8423a;}.td-purple{background:#8b3fbf;}
 
 /* LANDMARKS */
@@ -125,7 +125,7 @@ select option{background:#fff;}
 /* MY CITY SIDE */
 .my-coins-lbl{font-size:.9rem;font-weight:800;color:var(--sky-dark);margin-bottom:.4rem;}
 .mypills{display:flex;flex-wrap:wrap;gap:.4rem;}
-.mpill{border-radius:8px;padding:.28rem .65rem;font-size:.8rem;font-weight:800;border:2.5px solid transparent;}
+.mpill{border-radius:8px;padding:.35rem .75rem;font-size:.85rem;font-weight:800;border:2.5px solid transparent;}
 .mpill.blue{background:#d6eeff;border-color:#80c0f8;color:var(--sky-dark);}
 .mpill.green{background:#d4f5e0;border-color:#70d8a0;color:var(--green-dark);}
 .mpill.red{background:#ffe0de;border-color:#f09898;color:var(--red-dark);}
@@ -658,7 +658,7 @@ function renderMarket(){
     div.className='ecard '+cc+(canBuy?' buyable':'')+(cantAff?' cantaff':'')+((!initMode&&!buyMode)?' notturn':'');
     var typeLabels={blue:'🔵 Anyones roll',green:'🟢 Your roll only',red:'🔴 Others roll',purple:'🟣 Your roll only'};
     var typeLabel=typeLabels[e.type]||'';
-    div.innerHTML='<div class="croll">'+e.icon+' ['+e.roll.join(',')+']</div>'
+    div.innerHTML='<div class="croll"><span style="font-size:1.1rem;">'+e.icon+'</span> ['+e.roll.join(',')+']</div>'
       +'<div class="cname"><span class="tdot '+dc+'"></span>'+e.name+'</div>'
       +'<div class="ceff">'+e.eff+'</div>'
       +'<div class="ccost">🪙 '+e.cost+'</div>'
@@ -755,8 +755,8 @@ function renderSide(){
     const sp=document.createElement('div');
     sp.className='mpill '+cl;
     sp.style.cssText='display:flex;flex-direction:column;gap:1px;min-width:90px;';
-    sp.innerHTML='<span style="font-weight:800;">'+getTypeIcon(e.type)+' '+e.name+(cnt>1?' ×'+cnt:'')+'</span>'
-      +'<span style="font-size:.7rem;opacity:.85;">🎲['+e.roll.join(',')+'] '+incomeStr+'</span>';
+    sp.innerHTML='<span style="font-weight:800;font-size:.95rem;">'+e.icon+' '+e.name+(cnt>1?' ×'+cnt:'')+'</span>'
+      +'<span style="font-size:.72rem;opacity:.9;margin-top:1px;">🎲['+e.roll.join(',')+'] '+incomeStr+'</span>';
     grid.appendChild(sp);
   });
   const op=document.getElementById('oplayers');op.innerHTML='';
@@ -773,8 +773,8 @@ function renderSide(){
       const cl={blue:'blue',green:'green',red:'red',purple:'purple'}[e.type]||'blue';
       let incStr=getIncomeStr(eid);
       estHtml+='<div class="mpill '+cl+'" style="display:flex;flex-direction:column;gap:1px;min-width:80px;margin:.2rem .2rem 0 0;">'
-        +'<span style="font-weight:800;font-size:.75rem;">'+getTypeIcon(e.type)+' '+e.name+(cnt>1?' ×'+cnt:'')+'</span>'
-        +'<span style="font-size:.65rem;opacity:.85;">🎲['+e.roll.join(',')+'] '+incStr+'</span>'
+        +'<span style="font-weight:800;font-size:.82rem;">'+e.icon+' '+e.name+(cnt>1?' ×'+cnt:'')+'</span>'
+        +'<span style="font-size:.68rem;opacity:.9;margin-top:1px;">🎲['+e.roll.join(',')+'] '+incStr+'</span>'
         +'</div>';
     });
     d.innerHTML='<div class="opname" style="color:'+p2.color+';">'+p2.name+(act?' ⭐':'')+'</div>'
@@ -863,6 +863,8 @@ async function rollDice(nd){
     }
 
     gs.log.push({msg:`${myName} rolled [${dice.join('+')}]=${total}${doubles?' 🎲🎲 DOUBLES!':''}`,cls:'log-you'});
+    // Rule: if you have 0 coins when the build phase begins, get 1 free coin from the bank
+    if(myP().coins===0){myP().coins=1;gs.log.push({msg:`${myName} has no coins — gets 1 free coin from the bank!`,cls:'log-sys'});}
     gs.phase='buy';boughtThisTurn=false;
     extraTurn=doubles&&hasLm(myP(),'amusement_pk');
     radioTower=false;
