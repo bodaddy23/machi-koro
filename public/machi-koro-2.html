@@ -162,6 +162,26 @@ select option{background:#fff;}
 @keyframes bnc{from{transform:translateY(0)}to{transform:translateY(-22px)}}
 .wname{font-family:'Fredoka One',cursive;font-size:3.2rem;color:var(--sun);margin-bottom:.5rem;}
 .wsub{color:#80b8e8;font-size:1.1rem;font-weight:700;margin-bottom:2rem;}
+
+.coin-anim {
+  position: fixed;
+  font-size: 22px;
+  pointer-events: none;
+  z-index: 500;
+  opacity: 0;
+  transition: none;
+}
+.coin-pop {
+  position: fixed;
+  font-size: 1.1rem;
+  font-weight: 800;
+  pointer-events: none;
+  z-index: 501;
+  opacity: 0;
+  white-space: nowrap;
+  font-family: 'Fredoka One', cursive;
+  transition: none;
+}
 </style>
 </head>
 <body>
@@ -586,6 +606,86 @@ function playTurnChime() {
   } catch(e) {}
 }
 
+
+// ── COIN ANIMATION + SOUND ──
+function playCoinSound(gain) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (gain) {
+      [[523,0,0.12],[659,0.08,0.10],[784,0.16,0.08],[1047,0.26,0.07]].forEach(([freq,t,vol]) => {
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type='sine'; o.frequency.value=freq;
+        const s=ctx.currentTime+t;
+        g.gain.setValueAtTime(0,s);
+        g.gain.linearRampToValueAtTime(vol,s+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001,s+0.22);
+        o.start(s); o.stop(s+0.22);
+      });
+    } else {
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type='sine'; o.frequency.value=180;
+      const s=ctx.currentTime;
+      g.gain.setValueAtTime(0.15,s);
+      g.gain.exponentialRampToValueAtTime(0.001,s+0.25);
+      o.start(s); o.stop(s+0.25);
+    }
+  } catch(e) {}
+}
+
+function showCoinAnimation(amount, isGain) {
+  if(!amount || amount === 0) return;
+  playCoinSound(isGain);
+  const color = isGain ? '#2eb872' : '#e8423a';
+  const sign = isGain ? '+' : '-';
+  // Anchor to top-right area of screen so it doesn't obscure gameplay
+  const baseX = window.innerWidth - 180;
+  const baseY = 100;
+
+  // Floating +/- amount label
+  const pop = document.createElement('div');
+  pop.className = 'coin-pop';
+  pop.textContent = sign + amount + ' 🪙';
+  pop.style.color = color;
+  pop.style.left = baseX + 'px';
+  pop.style.top = baseY + 'px';
+  document.body.appendChild(pop);
+  setTimeout(() => {
+    pop.style.transition = 'opacity 0.3s ease, top 0.7s ease';
+    pop.style.opacity = '1';
+    pop.style.top = (baseY - 30) + 'px';
+    setTimeout(() => { pop.style.opacity = '0'; setTimeout(() => pop.remove(), 400); }, 800);
+  }, 10);
+
+  // Coin particles
+  const coinCount = Math.min(Math.max(amount, 1), 6);
+  for (let i = 0; i < coinCount; i++) {
+    setTimeout(() => {
+      const coin = document.createElement('div');
+      coin.className = 'coin-anim';
+      coin.textContent = '🪙';
+      const startX = baseX + (Math.random() - 0.5) * 60;
+      const startY = baseY + 20;
+      coin.style.left = startX + 'px';
+      coin.style.top = startY + 'px';
+      document.body.appendChild(coin);
+      const driftX = (Math.random() - 0.5) * 50;
+      const driftY = isGain ? -(40 + Math.random() * 40) : (20 + Math.random() * 20);
+      setTimeout(() => {
+        coin.style.transition = 'all 0.55s cubic-bezier(0.2,0.8,0.4,1)';
+        coin.style.opacity = '1';
+        coin.style.transform = 'translate(' + driftX + 'px,' + driftY + 'px)';
+        setTimeout(() => {
+          coin.style.transition = 'opacity 0.3s';
+          coin.style.opacity = '0';
+          setTimeout(() => coin.remove(), 350);
+        }, 480);
+      }, 10);
+    }, i * 65);
+  }
+}
+
 // ── RENDER ──
 function render(){
   if(!gs)return;
@@ -892,6 +992,9 @@ async function rollDice(nd){
     gs.log.push({msg:`${myName} rolled [${dice.join('+')}]=${total}${doubles?' 🎲🎲 DOUBLES!':''}`,cls:'log-you'});
     // Rule: if you have 0 coins when the build phase begins, get 1 free coin from the bank
     if(myP().coins===0){myP().coins=1;gs.log.push({msg:`${myName} has no coins — gets 1 free coin from the bank!`,cls:'log-sys'});}
+    // Show coin animation for my net coin change this roll
+    const _coinDelta = myP().coins - _coinsBefore;
+    if(_coinDelta !== 0) showCoinAnimation(Math.abs(_coinDelta), _coinDelta > 0);
     gs.phase='buy';boughtThisTurn=false;
     extraTurn=doubles&&hasLm(myP(),'amusement_pk');
     radioTower=false;
@@ -989,6 +1092,7 @@ async function buyEst(eid){
   player.coins-=e.cost;player.ests[eid]=(player.ests[eid]||0)+1;
   removeFromMarket(eid);boughtThisTurn=true;
   gs.log.push({msg:`${myName} bought ${e.name} for 🪙${e.cost}`,cls:'log-you'});
+  showCoinAnimation(e.cost, false);
   await push();render();syncLog();
 }
 
