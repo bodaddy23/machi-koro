@@ -579,6 +579,7 @@ function showDice(dice,anim){
 function renderMarket(){
   const grid=document.getElementById('mgrid');grid.innerHTML='';
   const player=myP();
+  console.log('renderMarket: phase=', gs.phase, 'isMyTurn=', isMyTurn(), 'myName=', myName, 'myIdx=', myIdx(), 'initIdx=', gs.initIdx, 'players=', gs.players.map(p=>p.name));
   const vis=[...(gs.market.vis.low||[]),...(gs.market.vis.high||[])];
   vis.forEach(eid=>{
     const e=getE(eid);if(!e)return;
@@ -654,8 +655,13 @@ function renderSide(){
 
 // ── INITIAL BUILD ──
 async function buyInit(eid){
-  if(!isMyTurn()||gs.phase!=='init'||gs._buying)return;
+  console.log('buyInit called', eid, 'phase:', gs.phase, 'isMyTurn:', isMyTurn(), '_buying:', gs._buying, 'myName:', myName, 'initIdx:', gs.initIdx, 'myIdx:', myIdx());
+  if(!isMyTurn()||gs.phase!=='init'||gs._buying){
+    console.log('buyInit blocked - isMyTurn:', isMyTurn(), 'phase:', gs.phase, '_buying:', gs._buying);
+    return;
+  }
   const player=myP();const e=getE(eid);
+  console.log('player coins:', player.coins, 'est cost:', e ? e.cost : 'est not found');
   if(!e||player.coins<e.cost)return;
   gs._buying=true;
   player.coins-=e.cost;
