@@ -344,9 +344,13 @@ function connectSocket(code){
     sock.onmessage=ev=>{
       const msg=JSON.parse(ev.data);
       if(msg.type==='state'&&msg.state){
+        // Resolve any pending loadRoom promises
         Object.values(pResolvers).forEach(r=>r(msg.state)); pResolvers={};
+        // Only update gs from server if we are NOT mid-push and the server has a newer state
         if(msg.state.gameState&&document.getElementById('game').style.display!=='none'){
-          if(msg.state.gameState.lastAction!==(gs?gs.lastAction:0)){gs=msg.state.gameState;render();syncLog();}
+          const serverAction=msg.state.gameState.lastAction||0;
+          const localAction=gs?gs.lastAction:0;
+          if(serverAction>localAction){gs=msg.state.gameState;render();syncLog();}
         }
         if(msg.state.status==='playing'&&document.getElementById('waiting').style.display!=='none'){clearInterval(poll);enterGame(msg.state);}
       }
@@ -519,8 +523,9 @@ function enterGame(room){
 }
 async function push(){
   gs.lastAction=Date.now();
-  const room=await loadRoom(roomCode);if(!room)return;
-  room.gameState=gs;room.lastUpdate=Date.now();
+  // Build a minimal room wrapper and save directly — do NOT call loadRoom
+  // as that would trigger onmessage and overwrite gs before the save completes
+  const room={code:roomCode,status:'playing',gameState:gs,lastUpdate:Date.now(),players:gs.players.map(p=>({name:p.name,color:p.color}))};
   await saveRoom(roomCode,room);
 }
 
@@ -579,7 +584,6 @@ function showDice(dice,anim){
 function renderMarket(){
   const grid=document.getElementById('mgrid');grid.innerHTML='';
   const player=myP();
-  console.log('renderMarket: phase=', gs.phase, 'isMyTurn=', isMyTurn(), 'myName=', myName, 'myIdx=', myIdx(), 'initIdx=', gs.initIdx, 'players=', gs.players.map(p=>p.name));
   const vis=[...(gs.market.vis.low||[]),...(gs.market.vis.high||[])];
   vis.forEach(eid=>{
     const e=getE(eid);if(!e)return;
@@ -655,13 +659,8 @@ function renderSide(){
 
 // ── INITIAL BUILD ──
 async function buyInit(eid){
-  console.log('buyInit called', eid, 'phase:', gs.phase, 'isMyTurn:', isMyTurn(), '_buying:', gs._buying, 'myName:', myName, 'initIdx:', gs.initIdx, 'myIdx:', myIdx());
-  if(!isMyTurn()||gs.phase!=='init'||gs._buying){
-    console.log('buyInit blocked - isMyTurn:', isMyTurn(), 'phase:', gs.phase, '_buying:', gs._buying);
-    return;
-  }
+  if(!isMyTurn()||gs.phase!=='init'||gs._buying)return;
   const player=myP();const e=getE(eid);
-  console.log('player coins:', player.coins, 'est cost:', e ? e.cost : 'est not found');
   if(!e||player.coins<e.cost)return;
   gs._buying=true;
   player.coins-=e.cost;
