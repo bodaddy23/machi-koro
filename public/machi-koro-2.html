@@ -324,7 +324,7 @@ const ESTS = [
 
 const LANDMARKS = [
   {id:'amusement_pk', name:'Amusement Park',    costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Roll doubles = take another turn (all players)'},
-  {id:'airport',      name:'Airport',            costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Don\'t build on your turn = get 5 coins (all players)'},
+  {id:'airport',      name:'Airport',            costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:"Don't build on your turn = get 5 coins (all players)"},
   {id:'charterhouse', name:'Charterhouse',       costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Roll 2 dice & earn nothing = get 3 coins (all players)'},
   {id:'farmers_mkt',  name:'Farmers Market',     costs:[10,14,22], scope:'all',     timing:'ongoing',   eff:'Your 🌾 ests earn +1 coin when activated (all players)'},
   {id:'forge',        name:'Forge',              costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Your ⚙️ ests earn +1 coin when activated (all players)'},
@@ -336,9 +336,9 @@ const LANDMARKS = [
   {id:'temple',       name:'Temple',             costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Roll doubles = take 2 coins from each opponent (all players)'},
   {id:'exhibit_hall', name:'Exhibit Hall',       costs:[12,16,22], scope:'builder', timing:'immediate', eff:'Take half (rd. down) from opponents with >10 coins (builder only)'},
   {id:'french_rest',  name:'French Restaurant',  costs:[10,14,22], scope:'builder', timing:'immediate', eff:'Take 2 coins from each opponent (builder only)'},
-  {id:'loan_office',  name:'Loan Office',        costs:[10,0,0],   scope:'builder', timing:'ongoing',   eff:'Reduce all landmark costs by 2. Only buildable if you\'re the only player with no landmarks.', special:'loan'},
+  {id:'loan_office',  name:'Loan Office',        costs:[10,0,0],   scope:'builder', timing:'ongoing',   eff:"Reduce all landmark costs by 2. Only buildable if you're the only player with no landmarks.", special:'loan'},
   {id:'museum',       name:'Museum',             costs:[12,16,22], scope:'builder', timing:'immediate', eff:'Take 3 coins per landmark each opponent owns (builder only)'},
-  {id:'park',         name:'Park',               costs:[12,16,22], scope:'builder', timing:'immediate', eff:'Redistribute all players\' coins evenly (builder only)'},
+  {id:'park',         name:'Park',               costs:[12,16,22], scope:'builder', timing:'immediate', eff:"Redistribute all players' coins evenly (builder only)"},
   {id:'publisher',    name:'Publisher',          costs:[10,14,22], scope:'builder', timing:'immediate', eff:'Take 1 coin per 🏪 est each opponent owns (builder only)'},
   {id:'radio_tower',  name:'Radio Tower',        costs:[12,16,22], scope:'builder', timing:'immediate', eff:'Take another turn after this one (builder only)'},
   {id:'tv_station',   name:'TV Station',         costs:[12,16,22], scope:'builder', timing:'immediate', eff:'Take 1 coin per ☕ est each opponent owns (builder only)'},
@@ -656,7 +656,7 @@ function renderMarket(){
     const dc={blue:'td-blue',green:'td-green',red:'td-red',purple:'td-purple'}[e.type]||'td-blue';
     const div=document.createElement('div');
     div.className='ecard '+cc+(canBuy?' buyable':'')+(cantAff?' cantaff':'')+((!initMode&&!buyMode)?' notturn':'');
-    var typeLabels={blue:'🔵 Anyone\'s roll',green:'🟢 Your roll only',red:'🔴 Others\' roll',purple:'🟣 Your roll only'};
+    var typeLabels={blue:"🔵 Anyone's roll",green:"🟢 Your roll only",red:"🔴 Others' roll",purple:"🟣 Your roll only"};
     var typeLabel=typeLabels[e.type]||'';
     div.innerHTML='<div class="croll">'+e.icon+' ['+e.roll.join(',')+']</div>'
       +'<div class="cname"><span class="tdot '+dc+'"></span>'+e.name+'</div>'
