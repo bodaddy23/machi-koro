@@ -163,20 +163,25 @@ select option{background:#fff;}
 .wname{font-family:'Fredoka One',cursive;font-size:3.2rem;color:var(--sun);margin-bottom:.5rem;}
 .wsub{color:#80b8e8;font-size:1.1rem;font-weight:700;margin-bottom:2rem;}
 
-.coin-anim {
-  position: fixed;
-  font-size: 22px;
+.coin-overlay {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
   z-index: 500;
+  overflow: hidden;
+}
+.coin-anim {
+  position: absolute;
+  font-size: 24px;
+  pointer-events: none;
   opacity: 0;
   transition: none;
 }
 .coin-pop {
-  position: fixed;
-  font-size: 1.1rem;
+  position: absolute;
+  font-size: 1.15rem;
   font-weight: 800;
   pointer-events: none;
-  z-index: 501;
   opacity: 0;
   white-space: nowrap;
   font-family: 'Fredoka One', cursive;
@@ -225,7 +230,7 @@ select option{background:#fff;}
 </div>
 
 <!-- GAME -->
-<div id="game">
+<div id="game" style="position:relative;"><div class="coin-overlay" id="coin-overlay"></div>
   <div class="topbar">
     <div class="tb-title">🏙️ Machi Koro 2</div>
     <div class="pchips" id="pchips"></div>
@@ -637,11 +642,13 @@ function playCoinSound(gain) {
 function showCoinAnimation(amount, isGain) {
   if(!amount || amount === 0) return;
   playCoinSound(isGain);
+  const overlay = document.getElementById('coin-overlay');
+  if(!overlay) return;
   const color = isGain ? '#2eb872' : '#e8423a';
   const sign = isGain ? '+' : '-';
-  // Anchor to top-right area of screen so it doesn't obscure gameplay
-  const baseX = window.innerWidth - 180;
-  const baseY = 100;
+  // Position in top-right of the game area
+  const baseX = overlay.offsetWidth - 160;
+  const baseY = 80;
 
   // Floating +/- amount label
   const pop = document.createElement('div');
@@ -650,12 +657,15 @@ function showCoinAnimation(amount, isGain) {
   pop.style.color = color;
   pop.style.left = baseX + 'px';
   pop.style.top = baseY + 'px';
-  document.body.appendChild(pop);
+  overlay.appendChild(pop);
   setTimeout(() => {
     pop.style.transition = 'opacity 0.3s ease, top 0.7s ease';
     pop.style.opacity = '1';
-    pop.style.top = (baseY - 30) + 'px';
-    setTimeout(() => { pop.style.opacity = '0'; setTimeout(() => pop.remove(), 400); }, 800);
+    pop.style.top = (baseY - 35) + 'px';
+    setTimeout(() => {
+      pop.style.opacity = '0';
+      setTimeout(() => pop.remove(), 400);
+    }, 900);
   }, 10);
 
   // Coin particles
@@ -665,24 +675,24 @@ function showCoinAnimation(amount, isGain) {
       const coin = document.createElement('div');
       coin.className = 'coin-anim';
       coin.textContent = '🪙';
-      const startX = baseX + (Math.random() - 0.5) * 60;
-      const startY = baseY + 20;
+      const startX = baseX + (Math.random() - 0.5) * 80;
+      const startY = baseY + 30;
       coin.style.left = startX + 'px';
       coin.style.top = startY + 'px';
-      document.body.appendChild(coin);
-      const driftX = (Math.random() - 0.5) * 50;
-      const driftY = isGain ? -(40 + Math.random() * 40) : (20 + Math.random() * 20);
+      overlay.appendChild(coin);
+      const driftX = (Math.random() - 0.5) * 60;
+      const driftY = isGain ? -(50 + Math.random() * 50) : (25 + Math.random() * 25);
       setTimeout(() => {
-        coin.style.transition = 'all 0.55s cubic-bezier(0.2,0.8,0.4,1)';
+        coin.style.transition = 'all 0.6s cubic-bezier(0.2,0.8,0.4,1)';
         coin.style.opacity = '1';
         coin.style.transform = 'translate(' + driftX + 'px,' + driftY + 'px)';
         setTimeout(() => {
           coin.style.transition = 'opacity 0.3s';
           coin.style.opacity = '0';
           setTimeout(() => coin.remove(), 350);
-        }, 480);
+        }, 520);
       }, 10);
-    }, i * 65);
+    }, i * 70);
   }
 }
 
@@ -1185,9 +1195,59 @@ async function endTurn(){
   await push();render();syncLog();
 }
 
+function playWinFanfare(){
+  try {
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const now=ctx.currentTime;
+    function sineNote(freq,start,dur,vol,detune){
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type='sine';o.frequency.value=freq;
+      if(detune)o.detune.value=detune;
+      g.gain.setValueAtTime(0,start);
+      g.gain.linearRampToValueAtTime(vol,start+0.04);
+      g.gain.setValueAtTime(vol,start+dur-0.08);
+      g.gain.exponentialRampToValueAtTime(0.001,start+dur+0.12);
+      o.start(start);o.stop(start+dur+0.15);
+    }
+    // Rising melody
+    [[392,0.00,0.14,0.20],[523,0.15,0.14,0.22],[659,0.30,0.14,0.22],
+     [784,0.45,0.20,0.24],[880,0.66,0.14,0.22],[988,0.81,0.14,0.22],
+     [1047,0.96,0.80,0.26]].forEach(([f,t,d,v])=>{
+      sineNote(f,now+t,d,v,0);
+      sineNote(f/2,now+t,d,v*0.12,0);
+    });
+    // Swell chord under final note
+    [[262,0.96,0.80,0.10],[330,0.96,0.80,0.10],
+     [392,0.96,0.80,0.10],[523,0.96,0.80,0.10]].forEach(([f,t,d,v])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,now+t);
+      g.gain.linearRampToValueAtTime(v,now+t+0.3);
+      g.gain.setValueAtTime(v,now+t+d-0.2);
+      g.gain.exponentialRampToValueAtTime(0.001,now+t+d+0.25);
+      o.start(now+t);o.stop(now+t+d+0.3);
+    });
+    // Bell shimmer
+    [1047,2093].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type='sine';o.frequency.value=f;
+      const s=now+0.96;
+      g.gain.setValueAtTime(0,s);
+      g.gain.linearRampToValueAtTime(0.06-i*0.02,s+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001,s+0.5);
+      o.start(s);o.stop(s+0.55);
+    });
+  } catch(e){}
+}
+
 function showWinner(name){
   document.getElementById('wname').textContent=name;
   document.getElementById('wscreen').style.display='flex';
+  // Only play fanfare for the local player's win screen
+  playWinFanfare();
 }
 </script>
 </body>
