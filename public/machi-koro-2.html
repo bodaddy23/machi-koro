@@ -4,1171 +4,905 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Machi Koro 2</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --gold: #c9a84c;
-    --gold-light: #e8c96a;
-    --gold-dark: #8a6e2a;
-    --ink: #1a1208;
-    --parchment: #f5edd6;
-    --parchment-dark: #e8d9b8;
-    --parchment-mid: #efe3c4;
-    --red-est: #8b2020;
-    --blue-est: #1a3a6b;
-    --green-est: #1a5c2a;
-    --purple-est: #4a1a6b;
-    --bg: #0e0a04;
-    --panel: #1c1408;
-    --panel-border: #3a2a10;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Crimson Pro', Georgia, serif;
-    background: var(--bg);
-    color: var(--parchment);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-  h1, h2, h3, .title-font { font-family: 'Cinzel', 'Times New Roman', serif; }
+:root {
+  --sky:#1a6bbf; --sky-dark:#0e4a8a; --sun:#f7c948; --sun-dark:#c9a000;
+  --green:#2eb872; --green-dark:#1a7a4a; --red:#e8423a; --red-dark:#a82820;
+  --purple:#8b3fbf; --purple-dark:#5c2280;
+  --panel:#f0f7ff; --panel-b:#b8d8f8; --bg:#e0eefa; --txt:#1a2a3a; --mid:#3a5a7a;
+  --shadow:0 4px 16px rgba(0,0,0,.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+h1,h2,h3,.ff{font-family:'Fredoka One',cursive;}
 
-  /* ---- LOBBY ---- */
-  #lobby {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    background: radial-gradient(ellipse at center, #2a1a06 0%, #0e0a04 70%);
-  }
-  .game-title {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(2.2rem, 6vw, 4rem);
-    font-weight: 700;
-    color: var(--gold);
-    text-align: center;
-    letter-spacing: 0.05em;
-    text-shadow: 0 0 40px rgba(201,168,76,0.4);
-    margin-bottom: 0.3rem;
-  }
-  .game-subtitle {
-    font-family: 'Cinzel', serif;
-    font-size: 1rem;
-    color: var(--gold-dark);
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    text-align: center;
-    margin-bottom: 3rem;
-  }
-  .lobby-card {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 2rem;
-    width: 100%;
-    max-width: 420px;
-    margin-bottom: 1rem;
-  }
-  .lobby-card h2 {
-    color: var(--gold);
-    font-size: 1.1rem;
-    letter-spacing: 0.1em;
-    margin-bottom: 1.2rem;
-    text-align: center;
-  }
-  input[type=text], input[type=number], select {
-    width: 100%;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--panel-border);
-    border-radius: 6px;
-    color: var(--parchment);
-    font-family: 'Crimson Pro', serif;
-    font-size: 1rem;
-    padding: 0.6rem 0.9rem;
-    margin-bottom: 0.8rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input:focus, select:focus { border-color: var(--gold); }
-  select option { background: #1c1408; }
-  .btn {
-    display: block;
-    width: 100%;
-    padding: 0.75rem;
-    background: var(--gold-dark);
-    color: var(--parchment);
-    border: 1px solid var(--gold);
-    border-radius: 6px;
-    font-family: 'Cinzel', serif;
-    font-size: 0.95rem;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    text-align: center;
-  }
-  .btn:hover { background: var(--gold); color: var(--ink); }
-  .btn:active { transform: scale(0.98); }
-  .btn-outline {
-    background: transparent;
-    color: var(--gold);
-    margin-top: 0.5rem;
-  }
-  .btn-outline:hover { background: rgba(201,168,76,0.15); color: var(--gold-light); }
-  .divider { height: 1px; background: var(--panel-border); margin: 1.2rem 0; }
-  .err { color: #e06060; font-size: 0.88rem; margin-bottom: 0.6rem; text-align: center; }
-  .info-text { color: var(--gold-dark); font-size: 0.9rem; text-align: center; margin-top: 0.5rem; }
+/* LOBBY */
+#lobby{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:linear-gradient(150deg,#1a6bbf,#0e4a8a 50%,#06285a);}
+.logo{font-family:'Fredoka One',cursive;font-size:clamp(2.8rem,9vw,5.5rem);color:var(--sun);text-align:center;text-shadow:0 5px 0 #806000,0 0 50px rgba(247,201,72,.5);margin-bottom:.2rem;}
+.logo-sub{font-family:'Fredoka One',cursive;font-size:1rem;color:#80b8e8;letter-spacing:.3em;text-align:center;margin-bottom:2.5rem;}
+.lcard{background:#fff;border-radius:20px;padding:1.8rem;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.25);margin-bottom:1rem;}
+.lcard h2{font-family:'Fredoka One',cursive;color:var(--sky);font-size:1.5rem;margin-bottom:1.2rem;text-align:center;}
+input,select{width:100%;background:#f0f7ff;border:2.5px solid var(--panel-b);border-radius:12px;color:var(--txt);font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:700;padding:.7rem 1rem;margin-bottom:.8rem;outline:none;transition:border-color .2s;}
+input:focus,select:focus{border-color:var(--sky);}
+select option{background:#fff;}
+.btn{display:block;width:100%;padding:.85rem;border:none;border-radius:14px;font-family:'Fredoka One',cursive;font-size:1.15rem;cursor:pointer;transition:filter .15s,transform .1s;text-align:center;letter-spacing:.03em;}
+.btn:active{transform:translateY(2px);}
+.btn-sky{background:var(--sky);color:#fff;box-shadow:0 5px 0 var(--sky-dark);}
+.btn-sky:hover{filter:brightness(1.1);}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 5px 0 var(--green-dark);}
+.btn-green:hover{filter:brightness(1.1);}
+.btn-sun{background:var(--sun);color:var(--txt);box-shadow:0 5px 0 var(--sun-dark);}
+.btn-sun:hover{filter:brightness(1.05);}
+.btn-out{background:transparent;color:var(--sky);border:2.5px solid var(--sky);box-shadow:none;}
+.btn-out:hover{background:rgba(26,107,191,.08);}
+.err{color:var(--red);font-size:.9rem;margin-bottom:.5rem;text-align:center;font-weight:800;}
 
-  /* ---- WAITING ROOM ---- */
-  #waiting { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
-  .room-code-box {
-    background: var(--panel);
-    border: 2px solid var(--gold);
-    border-radius: 10px;
-    padding: 1.5rem 2rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-  .room-code-label { font-size: 0.8rem; letter-spacing: 0.3em; color: var(--gold-dark); text-transform: uppercase; margin-bottom: 0.4rem; }
-  .room-code { font-family: 'Cinzel', serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 0.3em; }
-  .player-list { list-style: none; width: 100%; max-width: 360px; margin-bottom: 1.5rem; }
-  .player-list li {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 6px;
-    padding: 0.6rem 1rem;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-size: 1rem;
-  }
-  .player-list .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
-  .badge-host { font-size: 0.7rem; background: var(--gold-dark); color: var(--parchment); padding: 1px 6px; border-radius: 4px; margin-left: auto; }
+/* WAITING */
+#waiting{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:linear-gradient(150deg,#1a6bbf,#0e4a8a 50%,#06285a);}
+.rbox{background:#fff;border-radius:20px;padding:1.5rem 2.5rem;text-align:center;margin-bottom:1.5rem;box-shadow:var(--shadow);}
+.rlbl{font-size:.8rem;letter-spacing:.3em;color:var(--mid);text-transform:uppercase;margin-bottom:.3rem;}
+.rcode{font-family:'Fredoka One',cursive;font-size:3.2rem;color:var(--sky);letter-spacing:.4em;}
+.plist{list-style:none;width:100%;max-width:380px;margin-bottom:1.5rem;}
+.plist li{background:#fff;border-radius:14px;padding:.75rem 1.2rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.7rem;font-size:1.05rem;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+.pdot{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
+.badge-host{font-size:.7rem;background:var(--sun);color:var(--txt);padding:2px 8px;border-radius:20px;margin-left:auto;font-family:'Fredoka One',cursive;}
+.wstatus{color:#80b8e8;font-size:1rem;font-weight:700;text-align:center;}
 
-  /* ---- GAME BOARD ---- */
-  #game { display: none; flex-direction: column; min-height: 100vh; }
-  .top-bar {
-    background: var(--panel);
-    border-bottom: 1px solid var(--panel-border);
-    padding: 0.6rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .top-bar .game-name { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1rem; flex-shrink: 0; }
-  .players-strip { display: flex; gap: 0.5rem; flex-wrap: wrap; flex: 1; }
-  .player-chip {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--panel-border);
-    border-radius: 20px;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    transition: border-color 0.3s;
-  }
-  .player-chip.active { border-color: var(--gold); background: rgba(201,168,76,0.1); }
-  .player-chip.me { font-weight: 600; }
-  .coin-icon { color: var(--gold); font-size: 0.9rem; }
-  .turn-indicator { font-size: 0.8rem; color: var(--gold-dark); flex-shrink: 0; }
+/* GAME */
+#game{display:none;flex-direction:column;min-height:100vh;}
+.topbar{background:linear-gradient(90deg,var(--sky-dark),var(--sky));padding:.8rem 1.1rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,.2);}
+.tb-title{font-family:'Fredoka One',cursive;color:var(--sun);font-size:1.4rem;flex-shrink:0;}
+.pchips{display:flex;gap:.5rem;flex-wrap:wrap;flex:1;}
+.pchip{background:rgba(255,255,255,.15);border:2.5px solid rgba(255,255,255,.2);border-radius:22px;padding:.35rem 1rem;font-size:.95rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:.4rem;transition:all .3s;}
+.pchip.active{background:var(--sun);color:var(--txt);border-color:var(--sun-dark);transform:scale(1.06);}
+.tlbl{color:var(--sun);font-weight:800;font-size:1rem;flex-shrink:0;}
 
-  .game-body {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    flex: 1;
-    min-height: 0;
-    gap: 0;
-  }
-  @media (max-width: 750px) {
-    .game-body { grid-template-columns: 1fr; }
-    .side-panel { border-left: none !important; border-top: 1px solid var(--panel-border); }
-  }
+.gbody{display:grid;grid-template-columns:1fr 330px;flex:1;min-height:0;}
+@media(max-width:820px){.gbody{grid-template-columns:1fr;}.side{border-left:none!important;border-top:3px solid var(--panel-b);}}
+.main{padding:1.1rem;overflow-y:auto;}
+.side{background:#fff;border-left:3px solid var(--panel-b);padding:1.1rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem;}
 
-  .main-area { padding: 1rem; overflow-y: auto; }
-  .side-panel { background: var(--panel); border-left: 1px solid var(--panel-border); padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+.stitle{font-family:'Fredoka One',cursive;font-size:1.05rem;color:var(--sky-dark);padding-bottom:.3rem;border-bottom:3px solid var(--sun);display:inline-block;margin-bottom:.7rem;}
 
-  /* ---- MARKET ---- */
-  .section-title {
-    font-family: 'Cinzel', serif;
-    color: var(--gold);
-    font-size: 0.8rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 0.6rem;
-    border-bottom: 1px solid var(--panel-border);
-    padding-bottom: 0.3rem;
-  }
-  .market-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  .est-card {
-    border-radius: 8px;
-    padding: 0.5rem;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
-    border: 1px solid transparent;
-    position: relative;
-    min-height: 90px;
-    display: flex;
-    flex-direction: column;
-  }
-  .est-card:hover { transform: translateY(-2px); }
-  .est-card.buyable { border-color: var(--gold); }
-  .est-card.disabled { opacity: 0.45; cursor: default; pointer-events: none; }
-  .est-card.cant-afford { opacity: 0.6; cursor: default; }
-  .est-red { background: rgba(139,32,32,0.25); border-color: rgba(139,32,32,0.4); }
-  .est-blue { background: rgba(26,58,107,0.3); border-color: rgba(26,58,107,0.4); }
-  .est-green { background: rgba(26,92,42,0.25); border-color: rgba(26,92,42,0.4); }
-  .est-purple { background: rgba(74,26,107,0.25); border-color: rgba(74,26,107,0.4); }
-  .est-card .card-roll { font-size: 0.65rem; color: var(--gold-dark); }
-  .est-card .card-name { font-size: 0.72rem; font-weight: 600; color: var(--parchment); flex: 1; margin: 2px 0; line-height: 1.2; }
-  .est-card .card-effect { font-size: 0.62rem; color: var(--parchment-dark); line-height: 1.2; }
-  .est-card .card-cost { font-size: 0.7rem; color: var(--gold); margin-top: auto; font-weight: 600; }
-  .est-card .card-count { position: absolute; top: 3px; right: 5px; font-size: 0.65rem; background: var(--gold-dark); color: var(--parchment); border-radius: 8px; padding: 1px 5px; }
-  .color-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 3px; }
-  .dot-red { background: #e05050; }
-  .dot-blue { background: #6090e0; }
-  .dot-green { background: #50c050; }
-  .dot-purple { background: #a060e0; }
+/* PHASE BANNER */
+.pbanner{border-radius:12px;padding:.65rem 1.1rem;font-family:'Fredoka One',cursive;font-size:1rem;text-align:center;margin-bottom:.9rem;box-shadow:0 3px 0 rgba(0,0,0,.15);}
+.pbanner.init{background:linear-gradient(90deg,var(--green),var(--sky));color:#fff;}
+.pbanner.roll{background:var(--sky);color:#fff;}
+.pbanner.buy{background:var(--sun);color:var(--txt);}
+.pbanner.wait{background:#ccc;color:var(--mid);}
 
-  /* ---- LANDMARKS ---- */
-  .landmark-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
-  .landmark-card {
-    border-radius: 8px;
-    padding: 0.5rem 0.6rem;
-    border: 1px solid var(--panel-border);
-    background: rgba(255,255,255,0.03);
-    cursor: pointer;
-    transition: border-color 0.15s, transform 0.15s;
-  }
-  .landmark-card.built { background: rgba(201,168,76,0.12); border-color: var(--gold); }
-  .landmark-card.buildable:not(.built) { border-color: var(--gold-dark); cursor: pointer; }
-  .landmark-card .lm-name { font-size: 0.75rem; font-weight: 600; color: var(--parchment); }
-  .landmark-card .lm-cost { font-size: 0.7rem; color: var(--gold); }
-  .landmark-card .lm-desc { font-size: 0.62rem; color: var(--parchment-dark); margin-top: 2px; line-height: 1.2; }
-  .landmark-card .lm-status { font-size: 0.62rem; margin-top: 2px; }
-  .landmark-card.built .lm-status { color: #70c070; }
-  .landmark-card:not(.built) .lm-status { color: var(--gold-dark); }
+/* DICE */
+.dpanel{background:#fff;border-radius:18px;padding:1.3rem;margin-bottom:1.1rem;box-shadow:var(--shadow);}
+.dice-row{display:flex;gap:1.1rem;justify-content:center;margin:.8rem 0;}
+.die{width:70px;height:70px;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:2.2rem;color:var(--sky-dark);border:3.5px solid var(--sky);box-shadow:0 5px 0 var(--sky-dark);}
+.die.empty{border-color:#ccc;color:#ccc;box-shadow:0 5px 0 #aaa;}
+.die.rolling{animation:rd .65s ease;}
+@keyframes rd{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-22deg) scale(1.18)}75%{transform:rotate(22deg) scale(1.18)}}
+.dtotal{font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--sky);text-align:center;}
+.dhint{font-size:.95rem;color:var(--mid);text-align:center;font-weight:700;margin-top:.3rem;}
+.arow{display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center;margin-top:.9rem;}
+.abtn{background:var(--sky);color:#fff;border:none;border-radius:12px;padding:.65rem 1.5rem;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;box-shadow:0 4px 0 var(--sky-dark);transition:filter .15s,transform .1s;}
+.abtn:hover{filter:brightness(1.1);}
+.abtn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--sky-dark);}
+.abtn:disabled{opacity:.4;cursor:default;transform:none;}
+.abtn.gr{background:var(--green);box-shadow:0 4px 0 var(--green-dark);}
+.abtn.sun{background:var(--sun);color:var(--txt);box-shadow:0 4px 0 var(--sun-dark);}
+.abtn.red{background:var(--red);box-shadow:0 4px 0 var(--red-dark);}
 
-  /* ---- DICE ---- */
-  .dice-area { text-align: center; margin-bottom: 1rem; }
-  .dice-row { display: flex; gap: 1rem; justify-content: center; margin: 0.8rem 0; }
-  .die {
-    width: 52px; height: 52px;
-    background: var(--parchment);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Cinzel', serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--ink);
-    border: 2px solid var(--gold-dark);
-    transition: transform 0.3s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-  }
-  .die.rolling { animation: roll 0.6s ease; }
-  @keyframes roll {
-    0%,100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(-15deg) scale(1.1); }
-    75% { transform: rotate(15deg) scale(1.1); }
-  }
-  .die.empty { opacity: 0.3; }
-  .dice-total { font-size: 1.1rem; color: var(--gold); font-family: 'Cinzel', serif; }
-  .dice-info { font-size: 0.85rem; color: var(--parchment-dark); margin-top: 0.3rem; }
+/* MARKET */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:.65rem;margin-bottom:1.1rem;}
+.ecard{border-radius:14px;padding:.7rem;cursor:pointer;border:3px solid transparent;transition:transform .15s,box-shadow .15s;position:relative;min-height:115px;display:flex;flex-direction:column;box-shadow:0 3px 10px rgba(0,0,0,.1);}
+.ecard:hover.buyable{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.2);}
+.ecard.buyable{border-color:var(--sun)!important;cursor:pointer;}
+.ecard.cantaff{opacity:.55;cursor:not-allowed;}
+.ecard.notturn{cursor:default;}
+.ec-blue{background:#d6eeff;border-color:#80c0f8;}
+.ec-green{background:#d4f5e0;border-color:#70d8a0;}
+.ec-red{background:#ffe0de;border-color:#f09898;}
+.ec-purple{background:#ecdcff;border-color:#c090f0;}
+.croll{font-size:.75rem;color:var(--mid);font-weight:800;}
+.cname{font-size:.82rem;font-weight:800;color:var(--txt);flex:1;margin:3px 0;line-height:1.25;}
+.ceff{font-size:.67rem;color:var(--mid);line-height:1.3;}
+.ccost{font-size:.9rem;font-weight:800;color:var(--sky-dark);margin-top:auto;}
+.ccount{position:absolute;top:5px;right:7px;font-size:.72rem;background:var(--sky);color:#fff;border-radius:10px;padding:1px 7px;font-weight:800;}
+.tdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;vertical-align:middle;}
+.td-blue{background:#3a8fd4;}.td-green{background:#2eb872;}.td-red{background:#e8423a;}.td-purple{background:#8b3fbf;}
 
-  /* ---- ACTIONS ---- */
-  .action-row { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-  .action-btn {
-    background: var(--gold-dark);
-    color: var(--parchment);
-    border: 1px solid var(--gold);
-    border-radius: 6px;
-    padding: 0.5rem 1.2rem;
-    font-family: 'Cinzel', serif;
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .action-btn:hover { background: var(--gold); color: var(--ink); }
-  .action-btn:disabled { opacity: 0.4; cursor: default; }
-  .action-btn.secondary { background: transparent; color: var(--gold); }
-  .action-btn.secondary:hover { background: rgba(201,168,76,0.15); }
+/* LANDMARKS */
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.65rem;margin-bottom:1.1rem;}
+.lcard{border-radius:14px;padding:.75rem;border:3px solid #ccc;background:#f8f8f8;cursor:pointer;transition:border-color .2s,transform .15s;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.lcard.built{background:#fffbe0;border-color:var(--sun)!important;}
+.lcard.buildable{border-color:var(--green)!important;}
+.lcard:hover.buildable{transform:translateY(-3px);}
+.lname{font-size:.85rem;font-weight:800;color:var(--txt);}
+.lcosts{font-size:.74rem;color:var(--sky);font-weight:700;margin:.2rem 0;}
+.leff{font-size:.67rem;color:var(--mid);line-height:1.25;}
+.lstatus{font-size:.72rem;margin-top:.3rem;font-weight:800;}
+.lcard.built .lstatus{color:var(--green);}
+.lcard:not(.built) .lstatus{color:var(--mid);}
 
-  /* ---- LOG ---- */
-  .log-area { flex: 1; min-height: 80px; }
-  .log-entries { font-size: 0.82rem; line-height: 1.7; color: var(--parchment-dark); max-height: 200px; overflow-y: auto; }
-  .log-entries .log-you { color: var(--gold-light); }
-  .log-entries .log-system { color: var(--gold-dark); font-style: italic; }
+/* MY CITY SIDE */
+.my-coins-lbl{font-size:.9rem;font-weight:800;color:var(--sky-dark);margin-bottom:.4rem;}
+.mypills{display:flex;flex-wrap:wrap;gap:.4rem;}
+.mpill{border-radius:8px;padding:.28rem .65rem;font-size:.8rem;font-weight:800;border:2.5px solid transparent;}
+.mpill.blue{background:#d6eeff;border-color:#80c0f8;color:var(--sky-dark);}
+.mpill.green{background:#d4f5e0;border-color:#70d8a0;color:var(--green-dark);}
+.mpill.red{background:#ffe0de;border-color:#f09898;color:var(--red-dark);}
+.mpill.purple{background:#ecdcff;border-color:#c090f0;color:var(--purple-dark);}
 
-  /* ---- MODAL ---- */
-  .modal-bg {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 100;
-    align-items: center; justify-content: center;
-    padding: 1rem;
-  }
-  .modal-bg.show { display: flex; }
-  .modal {
-    background: var(--panel);
-    border: 1px solid var(--gold);
-    border-radius: 12px;
-    padding: 1.5rem;
-    max-width: 400px;
-    width: 100%;
-  }
-  .modal h2 { font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 1rem; font-size: 1.1rem; }
-  .modal p { font-size: 0.95rem; color: var(--parchment-dark); margin-bottom: 1rem; line-height: 1.6; }
-  .modal .btn { margin-top: 0.5rem; }
+/* OTHER PLAYERS */
+.opcard{background:var(--panel);border-radius:12px;padding:.65rem .9rem;margin-bottom:.5rem;border:2px solid var(--panel-b);}
+.opname{font-size:.95rem;font-weight:800;}
+.opinfo{font-size:.8rem;color:var(--mid);font-weight:600;}
 
-  /* ---- LOADING ---- */
-  .loading-text { color: var(--gold-dark); font-style: italic; font-size: 0.9rem; text-align: center; padding: 0.5rem; }
+/* LOG */
+.logbox{flex:1;}
+.logents{font-size:.84rem;line-height:1.75;max-height:230px;overflow-y:auto;}
+.log-you{color:var(--sky-dark);font-weight:700;}
+.log-sys{color:var(--green-dark);font-weight:700;font-style:italic;}
+.log-bad{color:var(--red-dark);font-weight:700;}
 
-  /* ---- YOUR ESTABLISHMENTS ---- */
-  .my-est-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-  .my-est-pill {
-    background: rgba(255,255,255,0.06);
-    border-radius: 4px;
-    padding: 2px 7px;
-    font-size: 0.72rem;
-    border: 1px solid var(--panel-border);
-  }
-  .my-est-pill.red { border-color: rgba(139,32,32,0.6); }
-  .my-est-pill.blue { border-color: rgba(26,58,107,0.6); }
-  .my-est-pill.green { border-color: rgba(26,92,42,0.6); }
-  .my-est-pill.purple { border-color: rgba(74,26,107,0.6); }
+/* MODAL */
+.modalbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+.modalbg.show{display:flex;}
+.modal{background:#fff;border-radius:22px;padding:1.8rem;max-width:430px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.modal h2{font-family:'Fredoka One',cursive;color:var(--sky);margin-bottom:.8rem;font-size:1.5rem;}
+.modal p{font-size:1rem;color:var(--mid);margin-bottom:1rem;line-height:1.6;font-weight:600;}
+.mbtns{display:flex;gap:.6rem;flex-wrap:wrap;}
 
-  /* ---- WINNER ---- */
-  #winner-screen {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.88);
-    z-index: 200;
-    align-items: center; justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    padding: 2rem;
-  }
-  .winner-crown { font-size: 4rem; margin-bottom: 1rem; }
-  .winner-name { font-family: 'Cinzel', serif; font-size: 2rem; color: var(--gold); margin-bottom: 0.5rem; }
-  .winner-sub { color: var(--parchment-dark); margin-bottom: 2rem; }
+/* POPUP */
+.popup{position:fixed;top:90px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;border-radius:16px;padding:.75rem 1.5rem;font-family:'Fredoka One',cursive;font-size:1.1rem;z-index:300;box-shadow:0 5px 18px rgba(0,0,0,.3);pointer-events:none;animation:pIn .4s ease,pOut .4s ease 2.2s forwards;}
+@keyframes pIn{from{opacity:0;transform:translateX(-50%) translateY(-22px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes pOut{from{opacity:1}to{opacity:0}}
+
+/* WINNER */
+#wscreen{display:none;position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:400;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:2rem;}
+.wemoji{font-size:5.5rem;margin-bottom:1rem;animation:bnc 1s infinite alternate;}
+@keyframes bnc{from{transform:translateY(0)}to{transform:translateY(-22px)}}
+.wname{font-family:'Fredoka One',cursive;font-size:3.2rem;color:var(--sun);margin-bottom:.5rem;}
+.wsub{color:#80b8e8;font-size:1.1rem;font-weight:700;margin-bottom:2rem;}
 </style>
 </head>
 <body>
 
 <!-- LOBBY -->
 <div id="lobby">
-  <div class="game-title">Machi Koro 2</div>
-  <div class="game-subtitle">Build your city</div>
-
-  <div class="lobby-card">
-    <h2>Create a Game</h2>
-    <input type="text" id="host-name" placeholder="Your name" maxlength="20" />
-    <select id="num-players">
+  <div class="logo">Machi Koro 2</div>
+  <div class="logo-sub">Build Your City!</div>
+  <div class="lcard">
+    <h2>🏗️ Create a Game</h2>
+    <input type="text" id="hname" placeholder="Your name" maxlength="20"/>
+    <select id="nplayers">
       <option value="2">2 Players</option>
       <option value="3">3 Players</option>
       <option value="4" selected>4 Players</option>
     </select>
-    <div id="host-err" class="err" style="display:none"></div>
-    <button class="btn" onclick="hostGame()">Create Room</button>
+    <div id="herr" class="err" style="display:none"></div>
+    <button class="btn btn-green" onclick="hostGame()">Create Room 🎲</button>
   </div>
-
-  <div class="lobby-card">
-    <h2>Join a Game</h2>
-    <input type="text" id="join-name" placeholder="Your name" maxlength="20" />
-    <input type="text" id="join-code" placeholder="Room code (e.g. ABCD)" maxlength="6" style="text-transform:uppercase;letter-spacing:0.2em;" />
-    <div id="join-err" class="err" style="display:none"></div>
-    <button class="btn btn-outline" onclick="joinGame()">Join Room</button>
+  <div class="lcard">
+    <h2>🚪 Join a Game</h2>
+    <input type="text" id="jname" placeholder="Your name" maxlength="20"/>
+    <input type="text" id="jcode" placeholder="Room code" maxlength="6" style="text-transform:uppercase;letter-spacing:.2em;"/>
+    <div id="jerr" class="err" style="display:none"></div>
+    <button class="btn btn-out" onclick="joinGame()">Join Room</button>
   </div>
 </div>
 
-<!-- WAITING ROOM -->
-<div id="waiting" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;">
-  <div class="game-title" style="font-size:1.8rem;margin-bottom:0.5rem;">Waiting for players...</div>
-  <div class="room-code-box" style="margin-top:1.5rem;">
-    <div class="room-code-label">Room Code</div>
-    <div class="room-code" id="display-code">----</div>
-    <div style="font-size:0.8rem;color:var(--gold-dark);margin-top:0.5rem;">Share this with friends</div>
+<!-- WAITING -->
+<div id="waiting">
+  <div class="logo" style="font-size:2.2rem;margin-bottom:.5rem;">Machi Koro 2</div>
+  <div class="rbox">
+    <div class="rlbl">Share this room code!</div>
+    <div class="rcode" id="dcode">----</div>
   </div>
-  <ul class="player-list" id="waiting-players"></ul>
-  <div id="start-game-area" style="width:100%;max-width:360px;display:none;">
-    <button class="btn" onclick="startGame()">Start Game</button>
+  <ul class="plist" id="wplist"></ul>
+  <div id="startarea" style="width:100%;max-width:380px;display:none;margin-bottom:1rem;">
+    <button class="btn btn-sun" onclick="startGame()">Start Game! 🚀</button>
   </div>
-  <div id="waiting-status" class="info-text">Waiting for more players to join...</div>
+  <div class="wstatus" id="wstatus">Waiting for players...</div>
 </div>
 
-<!-- GAME BOARD -->
-<div id="game" style="display:none;flex-direction:column;min-height:100vh;">
-  <div class="top-bar">
-    <div class="game-name">Machi Koro 2</div>
-    <div class="players-strip" id="players-strip"></div>
-    <div class="turn-indicator" id="turn-indicator"></div>
+<!-- GAME -->
+<div id="game">
+  <div class="topbar">
+    <div class="tb-title">🏙️ Machi Koro 2</div>
+    <div class="pchips" id="pchips"></div>
+    <div class="tlbl" id="tlbl"></div>
   </div>
-  <div class="game-body">
-    <div class="main-area">
-      <!-- Dice -->
-      <div class="section-title">Dice Roll</div>
-      <div class="dice-area" id="dice-area">
-        <div class="dice-row" id="dice-row">
+  <div class="gbody">
+    <div class="main">
+      <div id="pbanner" class="pbanner" style="display:none"></div>
+      <div class="dpanel">
+        <div class="stitle">🎲 Dice</div>
+        <div class="dice-row">
           <div class="die empty" id="die1">?</div>
           <div class="die empty" id="die2">?</div>
         </div>
-        <div class="dice-total" id="dice-total"></div>
-        <div class="dice-info" id="dice-info"></div>
-        <div class="action-row" style="margin-top:0.8rem;" id="action-btns">
-          <button class="action-btn" id="btn-roll1" onclick="rollDice(1)">Roll 1 Die</button>
-          <button class="action-btn secondary" id="btn-roll2" onclick="rollDice(2)">Roll 2 Dice</button>
+        <div class="dtotal" id="dtotal"></div>
+        <div class="dhint" id="dhint"></div>
+        <div class="arow" id="rollbtns">
+          <button class="abtn" id="b1die" onclick="rollDice(1)">Roll 1 Die</button>
+          <button class="abtn sun" id="b2dice" onclick="rollDice(2)">Roll 2 Dice</button>
         </div>
-        <div id="post-roll-actions" class="action-row" style="margin-top:0.8rem;display:none;">
-          <button class="action-btn" onclick="endTurn()">End Turn</button>
+        <div class="arow" id="postbtns" style="display:none">
+          <button class="abtn gr" onclick="endTurn()">End Turn ➡️</button>
         </div>
       </div>
-
-      <!-- Market -->
-      <div class="section-title" style="margin-top:1rem;">Market</div>
-      <div id="market-grid" class="market-grid"></div>
-
-      <!-- Landmarks -->
-      <div class="section-title">Landmarks (Build to Win)</div>
-      <div id="my-landmarks" class="landmark-grid"></div>
+      <div class="stitle">🏪 Market</div>
+      <div id="mgrid" class="mgrid"></div>
+      <div class="stitle">🏛️ Landmarks — Build 3 to Win!</div>
+      <div id="mlm" class="lgrid"></div>
     </div>
-
-    <!-- Side panel -->
-    <div class="side-panel">
+    <div class="side">
       <div>
-        <div class="section-title">Your Establishments</div>
-        <div id="my-establishments" class="my-est-grid"></div>
+        <div class="stitle">🏠 My City</div>
+        <div class="my-coins-lbl" id="mcoins"></div>
+        <div id="mests" class="mypills"></div>
       </div>
       <div>
-        <div class="section-title">Other Players' Cities</div>
-        <div id="other-players-info"></div>
+        <div class="stitle">👥 Other Players</div>
+        <div id="oplayers"></div>
       </div>
-      <div class="log-area">
-        <div class="section-title">Game Log</div>
-        <div class="log-entries" id="log-entries"></div>
+      <div class="logbox">
+        <div class="stitle">📜 Game Log</div>
+        <div class="logents" id="glog"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Winner screen -->
-<div id="winner-screen">
-  <div class="winner-crown">👑</div>
-  <div class="winner-name" id="winner-name"></div>
-  <div class="winner-sub">has built all their landmarks and won Machi Koro 2!</div>
-  <button class="btn" style="max-width:240px;margin:0 auto;" onclick="location.reload()">Play Again</button>
+<!-- Winner -->
+<div id="wscreen">
+  <div class="wemoji">🏆</div>
+  <div class="wname" id="wname"></div>
+  <div class="wsub">built 3 landmarks and won Machi Koro 2!</div>
+  <button class="btn btn-sun" style="max-width:260px;margin:0 auto;" onclick="location.reload()">Play Again! 🎉</button>
 </div>
 
 <!-- Modal -->
-<div class="modal-bg" id="modal-bg">
+<div class="modalbg" id="modalbg">
   <div class="modal">
-    <h2 id="modal-title">Notice</h2>
-    <p id="modal-body"></p>
-    <button class="btn" onclick="closeModal()">OK</button>
+    <h2 id="mtitle">Notice</h2>
+    <p id="mbody"></p>
+    <div class="mbtns" id="mbtns"><button class="btn btn-sky" onclick="closeModal()">OK</button></div>
   </div>
 </div>
 
 <script>
-// ============================================================
-// MACHI KORO 2 — Full Game Implementation
-// ============================================================
+// ═══════════════════════════════════════════
+// MACHI KORO 2 — Full Game Logic
+// ═══════════════════════════════════════════
 
-const STORAGE_PREFIX = 'mk2_';
-const POLL_INTERVAL = 2000;
-
-// --- GAME DATA ---
-const ESTABLISHMENTS = [
-  // [id, name, color, activation, cost, effect_desc, income_fn]
-  { id:'wheat',   name:'Wheat Field',   color:'blue',   roll:[1],     cost:1,  desc:'Get 1 coin from bank', count:0 },
-  { id:'ranch',   name:'Ranch',         color:'blue',   roll:[2],     cost:1,  desc:'Get 1 coin from bank', count:0 },
-  { id:'forest',  name:'Forest',        color:'blue',   roll:[5],     cost:3,  desc:'Get 1 coin from bank', count:0 },
-  { id:'mine',    name:'Mine',          color:'blue',   roll:[9],     cost:6,  desc:'Get 5 coins from bank', count:0 },
-  { id:'appletv', name:'Apple Orchard', color:'blue',   roll:[10],    cost:3,  desc:'Get 3 coins from bank', count:0 },
-  { id:'fruitvg', name:'Fruit & Veg.',  color:'green',  roll:[11,12], cost:2,  desc:'+1 coin/Wheat Field or Ranch you own', count:0 },
-  { id:'bakery',  name:'Bakery',        color:'green',  roll:[2,3],   cost:1,  desc:'Get 1 coin from bank', count:0 },
-  { id:'conveni', name:'Convenience',   color:'green',  roll:[4],     cost:2,  desc:'Get 3 coins from bank', count:0 },
-  { id:'cafe',    name:'Café',          color:'red',    roll:[3],     cost:2,  desc:'Take 1 coin from current player', count:0 },
-  { id:'restaurant',name:'Restaurant',  color:'red',    roll:[9,10],  cost:3,  desc:'Take 2 coins from current player', count:0 },
-  { id:'stadium', name:'Stadium',       color:'purple', roll:[6],     cost:6,  desc:'Take 2 coins from each player', count:0 },
-  { id:'tvstation',name:'TV Station',   color:'purple', roll:[6],     cost:7,  desc:'Take 5 coins from one player', count:0 },
-  { id:'bizcenter',name:'Biz. Center',  color:'purple', roll:[6],     cost:8,  desc:'Swap 1 establishment with a player', count:0 },
-  { id:'cheesefc',name:'Cheese Factory',color:'green',  roll:[7],     cost:5,  desc:'+3 coins/Ranch you own', count:0 },
-  { id:'furnitfc',name:'Furniture Fac.',color:'green',  roll:[8],     cost:3,  desc:'+3 coins/Forest or Mine you own', count:0 },
+// ── CARD DATA ──
+const ESTS = [
+  // BLUE — anyone's turn
+  {id:'wheat_field',  name:'Wheat Field',        type:'blue',  icon:'🌾', roll:[1,2],   cost:1, copies:5, eff:'Get 1 coin from bank'},
+  {id:'vineyard',     name:'Vineyard',            type:'blue',  icon:'🍇', roll:[2],     cost:1, copies:5, eff:'Get 2 coins from bank'},
+  {id:'flower_gdn',   name:'Flower Garden',       type:'blue',  icon:'🌸', roll:[4],     cost:2, copies:5, eff:'Get 2 coins from bank'},
+  {id:'forest',       name:'Forest',              type:'blue',  icon:'⚙️', roll:[5],     cost:3, copies:5, eff:'Get 2 coins from bank'},
+  {id:'corn_field',   name:'Corn Field',          type:'blue',  icon:'🌾', roll:[7],     cost:2, copies:5, eff:'Get 3 coins from bank'},
+  {id:'apple_orch',   name:'Apple Orchard',       type:'blue',  icon:'🌾', roll:[10],    cost:1, copies:5, eff:'Get 3 coins from bank'},
+  {id:'mine',         name:'Mine',                type:'blue',  icon:'⚙️', roll:[11,12], cost:4, copies:5, eff:'Get 6 coins from bank'},
+  // GREEN — your turn only
+  {id:'bakery',       name:'Bakery',              type:'green', icon:'🏪', roll:[2,3],   cost:1, copies:5, eff:'Get 2 coins from bank'},
+  {id:'convenience',  name:'Convenience Store',   type:'green', icon:'🏪', roll:[4],     cost:1, copies:5, eff:'Get 3 coins from bank'},
+  {id:'flower_shop',  name:'Flower Shop',         type:'green', icon:'🏪', roll:[6],     cost:1, copies:3, eff:'Get 3 coins per 🌸 est you own'},
+  {id:'furniture',    name:'Furniture Factory',   type:'green', icon:'🏪', roll:[8],     cost:4, copies:3, eff:'Get 4 coins per ⚙️ est you own'},
+  {id:'winery',       name:'Winery',              type:'green', icon:'🏪', roll:[9],     cost:3, copies:3, eff:'Get 3 coins per 🍇 est you own'},
+  {id:'food_wh',      name:'Food Warehouse',      type:'green', icon:'🏪', roll:[10,11], cost:2, copies:3, eff:'Get 2 coins per ☕ est you own'},
+  // RED — opponent's turn
+  {id:'sushi_bar',    name:'Sushi Bar',           type:'red',   icon:'☕', roll:[1],     cost:2, copies:5, eff:'Take 3 coins from active player'},
+  {id:'cafe',         name:'Café',                type:'red',   icon:'☕', roll:[3],     cost:1, copies:5, eff:'Take 2 coins from active player'},
+  {id:'hamburger',    name:'Hamburger Stand',     type:'red',   icon:'☕', roll:[8],     cost:1, copies:5, eff:'Take 2 coins from active player'},
+  {id:'family_rest',  name:'Family Restaurant',   type:'red',   icon:'☕', roll:[9,10],  cost:2, copies:5, eff:'Take 2 coins from active player'},
+  // PURPLE — your turn only
+  {id:'stadium',      name:'Stadium',             type:'purple',icon:'🏛️', roll:[7],    cost:3, copies:3, eff:'Take 3 coins from each opponent'},
+  {id:'biz_center',   name:'Business Center',     type:'purple',icon:'🏛️', roll:[6],    cost:3, copies:3, eff:'Swap 1 est with an opponent'},
+  {id:'shop_dist',    name:'Shopping District',   type:'purple',icon:'🏛️', roll:[8,9],  cost:3, copies:3, eff:'Take half from opponents with >10 coins'},
 ];
 
 const LANDMARKS = [
-  { id:'city_hall',   name:'City Hall',     cost:0,  desc:'If you have 0 coins at start of turn, get 1 coin', built_start:true },
-  { id:'harbor',      name:'Harbor',        cost:2,  desc:'When rolling for 10+, add 2 to total', built_start:false },
-  { id:'train_stn',   name:'Train Station', cost:4,  desc:'May roll 1 or 2 dice', built_start:false },
-  { id:'shopping',    name:'Shopping Mall', cost:10, desc:'+1 coin to each Green/Red establishment activation', built_start:false },
-  { id:'amusement',   name:'Amusement Pk.', cost:16, desc:'If doubles rolled, take another turn', built_start:false },
-  { id:'radio_tower', name:'Radio Tower',   cost:22, desc:'Once per turn, may re-roll all dice', built_start:false },
-  { id:'airport',     name:'Airport',       cost:30, desc:'If you build nothing on your turn, get 10 coins', built_start:false },
+  {id:'amusement_pk', name:'Amusement Park',    costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Roll doubles = take another turn (all players)'},
+  {id:'airport',      name:'Airport',            costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Don\'t build on your turn = get 5 coins (all players)'},
+  {id:'charterhouse', name:'Charterhouse',       costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Roll 2 dice & earn nothing = get 3 coins (all players)'},
+  {id:'farmers_mkt',  name:'Farmers Market',     costs:[10,14,22], scope:'all',     timing:'ongoing',   eff:'Your 🌾 ests earn +1 coin when activated (all players)'},
+  {id:'forge',        name:'Forge',              costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Your ⚙️ ests earn +1 coin when activated (all players)'},
+  {id:'moving_co',    name:'Moving Company',     costs:[10,14,22], scope:'all',     timing:'ongoing',   eff:'Roll doubles = give 1 est to player on right (all players)'},
+  {id:'observatory',  name:'Observatory',        costs:[10,14,22], scope:'all',     timing:'ongoing',   eff:'Reduces Launch Pad cost by 5 (all players)'},
+  {id:'shop_mall',    name:'Shopping Mall',      costs:[10,14,22], scope:'all',     timing:'ongoing',   eff:'Your 🏪 ests earn +1 coin when activated (all players)'},
+  {id:'soda_plant',   name:'Soda Bottling Plant',costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Your ☕ ests earn +1 coin when activated (all players)'},
+  {id:'tech_startup', name:'Tech Startup',       costs:[10,14,22], scope:'all',     timing:'ongoing',   eff:'Roll 12 = get 8 coins (all players)'},
+  {id:'temple',       name:'Temple',             costs:[12,16,22], scope:'all',     timing:'ongoing',   eff:'Roll doubles = take 2 coins from each opponent (all players)'},
+  {id:'exhibit_hall', name:'Exhibit Hall',       costs:[12,16,22], scope:'builder', timing:'immediate', eff:'Take half (rd. down) from opponents with >10 coins (builder only)'},
+  {id:'french_rest',  name:'French Restaurant',  costs:[10,14,22], scope:'builder', timing:'immediate', eff:'Take 2 coins from each opponent (builder only)'},
+  {id:'loan_office',  name:'Loan Office',        costs:[10,0,0],   scope:'builder', timing:'ongoing',   eff:'Reduce all landmark costs by 2. Only buildable if you\'re the only player with no landmarks.', special:'loan'},
+  {id:'museum',       name:'Museum',             costs:[12,16,22], scope:'builder', timing:'immediate', eff:'Take 3 coins per landmark each opponent owns (builder only)'},
+  {id:'park',         name:'Park',               costs:[12,16,22], scope:'builder', timing:'immediate', eff:'Redistribute all players\' coins evenly (builder only)'},
+  {id:'publisher',    name:'Publisher',          costs:[10,14,22], scope:'builder', timing:'immediate', eff:'Take 1 coin per 🏪 est each opponent owns (builder only)'},
+  {id:'radio_tower',  name:'Radio Tower',        costs:[12,16,22], scope:'builder', timing:'immediate', eff:'Take another turn after this one (builder only)'},
+  {id:'tv_station',   name:'TV Station',         costs:[12,16,22], scope:'builder', timing:'immediate', eff:'Take 1 coin per ☕ est each opponent owns (builder only)'},
+  {id:'launch_pad',   name:'Launch Pad',         costs:[45,38,25], scope:'builder', timing:'immediate', eff:'You win the game immediately! (builder only)', special:'win'},
 ];
 
-// --- STATE ---
-let myName = '';
-let roomCode = '';
-let isHost = false;
-let gameState = null;
-let pollTimer = null;
-let rolledThisTurn = false;
-let diceValues = [];
-let rerolledThisTurn = false;
-let extraTurnUsed = false;
-let boughtThisTurn = false;
-let pendingTVStation = false;
-let pendingBizCenter = false;
+// ── SOCKET / STORAGE ──
+const PFX = 'mk2r_';
+let myName='', roomCode='', isHost=false, gs=null, poll=null;
+let sock=null, pResolvers={};
+let boughtThisTurn=false, extraTurn=false, radioTower=false, rerolled=false;
 
-// --- STORAGE HELPERS ---
-let socket = null;
-let pendingResolvers = {};
+const PCOLORS=['#e8423a','#2eb872','#8b3fbf','#f7a030'];
 
-function connectSocket(code) {
-  return new Promise((resolve) => {
-    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    socket = new WebSocket(`${proto}://${location.host}`);
-
-    socket.onopen = () => {
-      socket.send(JSON.stringify({ type: 'join', code }));
-      resolve();
-    };
-
-    socket.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      if (msg.type === 'state' && msg.state) {
-        Object.values(pendingResolvers).forEach(resolve => resolve(msg.state));
-        pendingResolvers = {};
-        if (msg.state.gameState && document.getElementById('game').style.display !== 'none') {
-          gameState = msg.state.gameState;
-          renderGame();
+function connectSocket(code){
+  return new Promise(res=>{
+    const proto=location.protocol==='https:'?'wss':'ws';
+    sock=new WebSocket(`${proto}://${location.host}`);
+    sock.onopen=()=>{sock.send(JSON.stringify({type:'join',code}));res();};
+    sock.onmessage=ev=>{
+      const msg=JSON.parse(ev.data);
+      if(msg.type==='state'&&msg.state){
+        Object.values(pResolvers).forEach(r=>r(msg.state)); pResolvers={};
+        if(msg.state.gameState&&document.getElementById('game').style.display!=='none'){
+          if(msg.state.gameState.lastAction!==(gs?gs.lastAction:0)){gs=msg.state.gameState;render();syncLog();}
         }
+        if(msg.state.status==='playing'&&document.getElementById('waiting').style.display!=='none'){clearInterval(poll);enterGame(msg.state);}
       }
     };
-
-    socket.onerror = () => resolve();
+    sock.onerror=()=>res();
+  });
+}
+async function saveRoom(code,data){
+  if(!sock||sock.readyState!==1) await connectSocket(code);
+  if(sock.readyState===1) sock.send(JSON.stringify({type:'update',state:data}));
+}
+async function loadRoom(code){
+  return new Promise(res=>{
+    if(!sock||sock.readyState!==1){connectSocket(code).then(()=>setTimeout(()=>res(null),500));return;}
+    const id=Date.now(); pResolvers[id]=res;
+    sock.send(JSON.stringify({type:'join',code}));
+    setTimeout(()=>{delete pResolvers[id];res(null);},2500);
   });
 }
 
-async function saveRoom(code, data) {
-  if (!socket || socket.readyState !== 1) await connectSocket(code);
-  socket.send(JSON.stringify({ type: 'update', state: data }));
+// ── UTILS ──
+function gc(){return Math.random().toString(36).substring(2,6).toUpperCase();}
+function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';setTimeout(()=>e.style.display='none',4000);}
+function showModal(title,body,btns=[{lbl:'OK',fn:closeModal}]){
+  document.getElementById('mtitle').textContent=title;
+  document.getElementById('mbody').textContent=body;
+  const bc=document.getElementById('mbtns');bc.innerHTML='';
+  btns.forEach(b=>{const btn=document.createElement('button');btn.className='btn btn-sky';btn.textContent=b.lbl;btn.onclick=b.fn;bc.appendChild(btn);});
+  document.getElementById('modalbg').classList.add('show');
+}
+function closeModal(){document.getElementById('modalbg').classList.remove('show');}
+function popup(msg){const p=document.createElement('div');p.className='popup';p.textContent=msg;document.body.appendChild(p);setTimeout(()=>p.remove(),2700);}
+function glog(msg,cls=''){if(!gs)return;if(!gs.log)gs.log=[];gs.log.push({msg,cls});syncLog();}
+function syncLog(){
+  if(!gs||!gs.log)return;
+  const el=document.getElementById('glog');el.innerHTML='';
+  gs.log.slice(-60).forEach(e=>{const d=document.createElement('div');d.className=e.cls||'';d.textContent=e.msg;el.appendChild(d);});
+  el.scrollTop=el.scrollHeight;
 }
 
-async function loadRoom(code) {
-  return new Promise((resolve) => {
-    if (!socket || socket.readyState !== 1) {
-      connectSocket(code);
-      // Wait briefly for connection + state delivery
-      setTimeout(() => resolve(null), 500);
-      return;
-    }
-    // Request latest state — server will broadcast it back
-    const id = Date.now();
-    pendingResolvers[id] = resolve;
-    socket.send(JSON.stringify({ type: 'join', code })); // re-join triggers a state push
-    setTimeout(() => { delete pendingResolvers[id]; resolve(null); }, 2000);
-  });
+// ── CARD HELPERS ──
+function getE(id){return ESTS.find(e=>e.id===id);}
+function getL(id){return LANDMARKS.find(l=>l.id===id);}
+function myIdx(){return gs.players.findIndex(p=>p.name===myName);}
+function myP(){return gs.players[myIdx()];}
+function curP(){return gs.players[gs.curIdx];}
+function isMyTurn(){
+  if(gs.phase==='init')return gs.initIdx===myIdx();
+  return gs.curIdx===myIdx();
 }
-// --- UTILS ---
-function genCode() {
-  return Math.random().toString(36).substring(2,6).toUpperCase();
-}
-function showErr(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg; el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 4000);
-}
-function log(msg, type='') {
-  const el = document.getElementById('log-entries');
-  const div = document.createElement('div');
-  div.className = type ? 'log-'+type : '';
-  div.textContent = msg;
-  el.appendChild(div);
-  el.scrollTop = el.scrollHeight;
-}
-function showModal(title, body) {
-  document.getElementById('modal-title').textContent = title;
-  document.getElementById('modal-body').textContent = body;
-  document.getElementById('modal-bg').classList.add('show');
-}
-function closeModal() {
-  document.getElementById('modal-bg').classList.remove('show');
-}
+function hasLm(player,lid){return player.landmarks&&player.landmarks.includes(lid);}
+function estCnt(player,id){return player.ests[id]||0;}
 
-// --- LOBBY ---
-async function hostGame() {
-  const name = document.getElementById('host-name').value.trim();
-  if (!name) return showErr('host-err','Enter your name');
-  const np = parseInt(document.getElementById('num-players').value);
-  myName = name;
-  isHost = true;
-  roomCode = genCode();
-  await connectSocket(roomCode);
-  const room = {
-    code: roomCode,
-    status: 'waiting',
-    numPlayers: np,
-    players: [{ name, coins: 3, establishments: initEstablishments(), landmarks: initLandmarks(), isHost: true }],
-    gameState: null,
-    lastUpdate: Date.now(),
-  };
-  await saveRoom(roomCode, room);
-  showWaiting(room);
-}
-
-async function joinGame() {
-  const name = document.getElementById('join-name').value.trim();
-  const code = document.getElementById('join-code').value.trim().toUpperCase();
-  if (!name) return showErr('join-err','Enter your name');
-  if (code.length < 4) return showErr('join-err','Enter a valid room code');
-  const room = await loadRoom(code);
-  if (!room) return showErr('join-err','Room not found');
-  if (room.status !== 'waiting') return showErr('join-err','Game already started');
-  if (room.players.length >= room.numPlayers) return showErr('join-err','Room is full');
-  if (room.players.find(p => p.name === name)) return showErr('join-err','Name taken');
-  myName = name; isHost = false; roomCode = code;
-  await connectSocket(roomCode);
-  room.players.push({ name, coins: 3, establishments: initEstablishments(), landmarks: initLandmarks(), isHost: false });
-  room.lastUpdate = Date.now();
-  await saveRoom(code, room);
-  showWaiting(room);
-}
-
-function initEstablishments() {
-  // Each player starts with: Wheat Field(1) and Bakery(1)
-  const owned = {};
-  owned['wheat'] = 1;
-  owned['bakery'] = 1;
-  return owned;
-}
-
-function initLandmarks() {
-  const lm = {};
-  LANDMARKS.forEach(l => { lm[l.id] = l.built_start ? true : false; });
-  return lm;
-}
-
-function showWaiting(room) {
-  document.getElementById('lobby').style.display = 'none';
-  document.getElementById('waiting').style.display = 'flex';
-  document.getElementById('display-code').textContent = roomCode;
-  updateWaitingList(room);
-  startWaitingPoll();
-}
-
-function updateWaitingList(room) {
-  const ul = document.getElementById('waiting-players');
-  ul.innerHTML = room.players.map((p,i) =>
-    `<li><span class="dot"></span>${p.name}${p.isHost ? '<span class="badge-host">HOST</span>':''}</li>`
-  ).join('');
-  const need = room.numPlayers - room.players.length;
-  document.getElementById('waiting-status').textContent = need > 0
-    ? `Waiting for ${need} more player${need>1?'s':''}...`
-    : 'All players joined!';
-  const startArea = document.getElementById('start-game-area');
-  if (isHost && room.players.length >= 2) {
-    startArea.style.display = 'block';
-  } else {
-    startArea.style.display = 'none';
+function lmCost(player,lid){
+  const lm=getL(lid);
+  const n=player.lmCount||0;
+  let base=lm.costs[Math.min(n,lm.costs.length-1)]||lm.costs[0];
+  if(hasLm(player,'loan_office'))base=Math.max(0,base-2);
+  if(lid==='launch_pad'){
+    const obsCount=gs.players.filter(p=>hasLm(p,'observatory')).length;
+    base=Math.max(0,base-obsCount*5);
   }
+  return base;
 }
 
-function startWaitingPoll() {
-  if (pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(async () => {
-    const room = await loadRoom(roomCode);
-    if (!room) return;
-    if (room.status === 'playing') {
-      clearInterval(pollTimer);
-      enterGame(room);
-      return;
-    }
-    updateWaitingList(room);
-  }, POLL_INTERVAL);
+// ── SETUP ──
+function buildDeck(){
+  const d=[];
+  ESTS.forEach(e=>{for(let i=0;i<e.copies;i++)d.push(e.id);});
+  for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}
+  return d;
 }
+function buildMarket(deck){
+  const low=[],high=[],lset=new Set(),hset=new Set();
+  const ldeck=[],hdeck=[];
+  deck.forEach(id=>{const e=getE(id);if(Math.max(...e.roll)<=6)ldeck.push(id);else hdeck.push(id);});
+  let li=0,hi=0;
+  while(lset.size<5&&li<ldeck.length){lset.add(ldeck[li++]);}
+  while(hset.size<5&&hi<hdeck.length){hset.add(hdeck[hi++]);}
+  return{supply:{low:ldeck.slice(li),high:hdeck.slice(hi)},vis:{low:[...lset],high:[...hset]}};
+}
+function buildLmPool(){
+  const ids=LANDMARKS.map(l=>l.id).filter(id=>id!=='loan_office');
+  for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}
+  // pick 8 random + loan office
+  const pool=ids.slice(0,8);
+  pool.push('loan_office');
+  return pool;
+}
+function initPlayer(name,color){return{name,color,coins:5,ests:{},landmarks:[],lmCount:0};}
 
-async function startGame() {
-  const room = await loadRoom(roomCode);
-  if (!room) return;
-  // Build initial market (6 unique establishments available)
-  const shuffled = [...ESTABLISHMENTS].sort(()=>Math.random()-0.5);
-  const market = shuffled.slice(0,6).reduce((acc, e) => { acc[e.id] = 6; return acc; }, {});
-  const gs = {
-    players: room.players,
-    market,
-    currentPlayerIdx: 0,
-    turnPhase: 'roll', // roll | buy | end
-    log: [],
-    lastAction: Date.now(),
+// ── LOBBY ──
+async function hostGame(){
+  const name=document.getElementById('hname').value.trim();
+  if(!name)return showErr('herr','Enter your name');
+  const np=parseInt(document.getElementById('nplayers').value);
+  myName=name;isHost=true;roomCode=gc();
+  await connectSocket(roomCode);
+  const room={code:roomCode,status:'waiting',numPlayers:np,players:[{name,color:PCOLORS[0],isHost:true}],gameState:null,lastUpdate:Date.now()};
+  await saveRoom(roomCode,room);
+  showWaiting(room);
+}
+async function joinGame(){
+  const name=document.getElementById('jname').value.trim();
+  const code=document.getElementById('jcode').value.trim().toUpperCase();
+  if(!name)return showErr('jerr','Enter your name');
+  if(code.length<4)return showErr('jerr','Enter a valid room code');
+  await connectSocket(code);
+  const room=await loadRoom(code);
+  if(!room)return showErr('jerr','Room not found');
+  if(room.status!=='waiting')return showErr('jerr','Game already started');
+  if(room.players.length>=room.numPlayers)return showErr('jerr','Room is full');
+  if(room.players.find(p=>p.name===name))return showErr('jerr','Name already taken');
+  myName=name;isHost=false;roomCode=code;
+  room.players.push({name,color:PCOLORS[room.players.length%PCOLORS.length],isHost:false});
+  room.lastUpdate=Date.now();
+  await saveRoom(code,room);
+  showWaiting(room);
+}
+function showWaiting(room){
+  document.getElementById('lobby').style.display='none';
+  document.getElementById('waiting').style.display='flex';
+  document.getElementById('dcode').textContent=roomCode;
+  updateWait(room);startWaitPoll();
+}
+function updateWait(room){
+  document.getElementById('wplist').innerHTML=room.players.map(p=>`<li><span class="pdot" style="background:${p.color}"></span>${p.name}${p.isHost?'<span class="badge-host">HOST</span>':''}</li>`).join('');
+  const need=room.numPlayers-room.players.length;
+  document.getElementById('wstatus').textContent=need>0?`Waiting for ${need} more player${need>1?'s':''}...`:'All players joined — host can start!';
+  document.getElementById('startarea').style.display=(isHost&&room.players.length>=2)?'block':'none';
+}
+function startWaitPoll(){
+  if(poll)clearInterval(poll);
+  poll=setInterval(async()=>{
+    const room=await loadRoom(roomCode);
+    if(!room)return;
+    if(room.status==='playing'){clearInterval(poll);enterGame(room);return;}
+    updateWait(room);
+  },2000);
+}
+async function startGame(){
+  const room=await loadRoom(roomCode);if(!room)return;
+  const deck=buildDeck();
+  const market=buildMarket(deck);
+  const lmPool=buildLmPool();
+  const players=room.players.map(p=>initPlayer(p.name,p.color));
+  const newGs={
+    players,market,lmPool,curIdx:0,
+    phase:'init',initIdx:0,initRoundsLeft:3,
+    log:[],lastAction:Date.now(),lastDice:null,lastTotal:null
   };
-  room.status = 'playing';
-  room.gameState = gs;
-  room.lastUpdate = Date.now();
-  await saveRoom(roomCode, room);
+  newGs.log.push({msg:'🎲 Game started! 3 initial building rounds — each player picks 1 establishment.',cls:'log-sys'});
+  newGs.log.push({msg:`${players[0].name}: choose an establishment to buy.`,cls:'log-sys'});
+  room.status='playing';room.gameState=newGs;room.lastUpdate=Date.now();
+  await saveRoom(roomCode,room);
   enterGame(room);
 }
 
-// --- ENTER GAME ---
-function enterGame(room) {
-  if (pollTimer) clearInterval(pollTimer);
-  gameState = room.gameState;
-  document.getElementById('waiting').style.display = 'none';
-  document.getElementById('game').style.display = 'flex';
-  renderGame();
-  startGamePoll();
+// ── ENTER GAME ──
+function enterGame(room){
+  if(poll)clearInterval(poll);
+  gs=room.gameState;
+  document.getElementById('waiting').style.display='none';
+  document.getElementById('game').style.display='flex';
+  render();syncLog();
+  poll=setInterval(async()=>{
+    const room=await loadRoom(roomCode);
+    if(room&&room.gameState&&room.gameState.lastAction!==gs.lastAction){gs=room.gameState;render();syncLog();}
+  },2000);
+}
+async function push(){
+  gs.lastAction=Date.now();
+  const room=await loadRoom(roomCode);if(!room)return;
+  room.gameState=gs;room.lastUpdate=Date.now();
+  await saveRoom(roomCode,room);
 }
 
-function myPlayerIdx() {
-  return gameState.players.findIndex(p => p.name === myName);
-}
-function myPlayer() {
-  return gameState.players[myPlayerIdx()];
-}
-function isMyTurn() {
-  return gameState.currentPlayerIdx === myPlayerIdx();
+// ── RENDER ──
+function render(){
+  if(!gs)return;
+  if(gs.winner){showWinner(gs.winner);return;}
+  renderTopBar();renderBanner();renderDice();renderMarket();renderLandmarks();renderSide();
 }
 
-function startGamePoll() {
-  if (pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(async () => {
-    const room = await loadRoom(roomCode);
-    if (!room || !room.gameState) return;
-    const newGs = room.gameState;
-    if (newGs.lastAction !== (gameState ? gameState.lastAction : 0)) {
-      gameState = newGs;
-      renderGame();
-      // sync log
-      const logEl = document.getElementById('log-entries');
-      logEl.innerHTML = '';
-      (gameState.log || []).forEach(entry => {
-        const d = document.createElement('div');
-        d.textContent = entry.msg;
-        if (entry.player === myName) d.className = 'log-you';
-        if (!entry.player) d.className = 'log-system';
-        logEl.appendChild(d);
-      });
-      logEl.scrollTop = logEl.scrollHeight;
-    }
-  }, POLL_INTERVAL);
-}
-
-// --- RENDER ---
-function renderGame() {
-  if (!gameState) return;
-  const me = myPlayer();
-  const curPlayer = gameState.players[gameState.currentPlayerIdx];
-
-  // Top bar
-  const strip = document.getElementById('players-strip');
-  strip.innerHTML = gameState.players.map((p,i) => {
-    const active = i === gameState.currentPlayerIdx;
-    const isMe = p.name === myName;
-    return `<div class="player-chip${active?' active':''}${isMe?' me':''}">
-      <span class="coin-icon">◆</span>${p.name}: ${p.coins}
-    </div>`;
+function renderTopBar(){
+  document.getElementById('pchips').innerHTML=gs.players.map((p,i)=>{
+    const active=gs.phase==='init'?i===gs.initIdx:i===gs.curIdx;
+    return`<div class="pchip${active?' active':''}${p.name===myName?' me':''}">
+      <span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:${p.color};margin-right:2px;"></span>
+      ${p.name}: 🪙${p.coins} 🏛️${p.lmCount||0}/3</div>`;
   }).join('');
-  document.getElementById('turn-indicator').textContent =
-    isMyTurn() ? '⭐ Your Turn' : `${curPlayer.name}'s Turn`;
-
-  // Dice area
-  const phase = gameState.turnPhase || 'roll';
-  renderDiceArea(phase, me);
-
-  // Market
-  renderMarket(me, phase);
-
-  // My landmarks
-  renderLandmarks(me, phase);
-
-  // My establishments
-  renderMyEstablishments(me);
-
-  // Other players
-  renderOtherPlayers();
+  const lbl=document.getElementById('tlbl');
+  if(gs.phase==='init'){const cp=gs.players[gs.initIdx];lbl.textContent=isMyTurn()?'⭐ Your turn to build!':`${cp.name}'s build turn`;}
+  else lbl.textContent=isMyTurn()?'⭐ Your Turn!':`${curP().name}'s Turn`;
 }
 
-function renderDiceArea(phase, me) {
-  const hasTrainStation = me.landmarks['train_stn'];
-  const roll1 = document.getElementById('btn-roll1');
-  const roll2 = document.getElementById('btn-roll2');
-  const postRoll = document.getElementById('post-roll-actions');
-  const actionBtns = document.getElementById('action-btns');
-
-  if (!isMyTurn()) {
-    actionBtns.style.display = 'none';
-    postRoll.style.display = 'none';
-    // show dice if available
-    if (gameState.lastDice) {
-      showDice(gameState.lastDice, false);
-    }
-    return;
-  }
-
-  if (phase === 'roll') {
-    actionBtns.style.display = 'flex';
-    postRoll.style.display = 'none';
-    roll1.disabled = false;
-    roll2.disabled = !hasTrainStation;
-    roll2.title = hasTrainStation ? '' : 'Build Train Station to roll 2 dice';
-    document.getElementById('dice-total').textContent = '';
-    document.getElementById('dice-info').textContent = hasTrainStation ? 'Choose 1 or 2 dice' : 'Roll 1 die';
-    if (!gameState.lastDice) {
-      document.getElementById('die1').textContent = '?';
-      document.getElementById('die1').className = 'die empty';
-      document.getElementById('die2').textContent = '?';
-      document.getElementById('die2').className = 'die empty';
-    }
-  } else if (phase === 'buy') {
-    actionBtns.style.display = 'none';
-    postRoll.style.display = 'flex';
-    if (gameState.lastDice) showDice(gameState.lastDice, false);
+function renderBanner(){
+  const b=document.getElementById('pbanner');
+  b.style.display='block';
+  if(gs.phase==='init'){
+    const rd=4-gs.initRoundsLeft;
+    b.className='pbanner init';
+    b.textContent=`🏗️ Initial Building Round ${rd}/3 — ${isMyTurn()?'Click an establishment below to buy it!':gs.players[gs.initIdx].name+' is choosing...'}`;
+  }else if(gs.phase==='roll'){
+    b.className=isMyTurn()?'pbanner roll':'pbanner wait';
+    b.textContent=isMyTurn()?'🎲 Roll the dice!':'⏳ Waiting for '+curP().name+' to roll...';
+  }else if(gs.phase==='buy'){
+    b.className=isMyTurn()?'pbanner buy':'pbanner wait';
+    b.textContent=isMyTurn()?'🏪 Build phase — buy something or end your turn':'⏳ Waiting for '+curP().name+' to build...';
   }
 }
 
-function showDice(dice, animate) {
-  const d1 = document.getElementById('die1');
-  const d2 = document.getElementById('die2');
-  if (animate) {
-    d1.className = 'die rolling'; d2.className = 'die rolling';
-    setTimeout(() => {
-      d1.className = 'die'; d2.className = dice.length > 1 ? 'die' : 'die empty';
-      d1.textContent = dice[0];
-      d2.textContent = dice.length > 1 ? dice[1] : '·';
-    }, 600);
-  } else {
-    d1.className = 'die'; d1.textContent = dice[0];
-    d2.className = dice.length > 1 ? 'die' : 'die empty';
-    d2.textContent = dice.length > 1 ? dice[1] : '·';
-  }
-  const total = dice.reduce((a,b)=>a+b,0);
-  document.getElementById('dice-total').textContent = `Total: ${total}`;
+function renderDice(){
+  const rb=document.getElementById('rollbtns'),pb=document.getElementById('postbtns');
+  if(gs.phase==='init'){rb.style.display='none';pb.style.display='none';document.getElementById('dtotal').textContent='';document.getElementById('dhint').textContent='No dice in initial building';return;}
+  if(!isMyTurn()){rb.style.display='none';pb.style.display='none';if(gs.lastDice)showDice(gs.lastDice,false);return;}
+  if(gs.phase==='roll'){rb.style.display='flex';pb.style.display='none';document.getElementById('dhint').textContent='Choose 1 or 2 dice';}
+  else{rb.style.display='none';pb.style.display='flex';if(gs.lastDice)showDice(gs.lastDice,false);}
+}
+function showDice(dice,anim){
+  const d1=document.getElementById('die1'),d2=document.getElementById('die2');
+  if(anim){d1.className='die rolling';d2.className='die rolling';
+    setTimeout(()=>{d1.className='die';d1.textContent=dice[0];if(dice.length>1){d2.className='die';d2.textContent=dice[1];}else{d2.className='die empty';d2.textContent='?';}},660);}
+  else{d1.className='die';d1.textContent=dice[0];if(dice.length>1){d2.className='die';d2.textContent=dice[1];}else{d2.className='die empty';d2.textContent='?';}}
+  const t=dice.reduce((a,b)=>a+b,0);
+  document.getElementById('dtotal').textContent=`Total: ${t}`;
+  document.getElementById('dhint').textContent=(dice.length>1&&dice[0]===dice[1])?'🎉 Doubles!':'';
 }
 
-function renderMarket(me, phase) {
-  const grid = document.getElementById('market-grid');
-  grid.innerHTML = '';
-  const market = gameState.market || {};
-  Object.keys(market).forEach(eid => {
-    const count = market[eid];
-    if (count <= 0) return;
-    const est = ESTABLISHMENTS.find(e => e.id === eid);
-    if (!est) return;
-    const canBuy = isMyTurn() && phase === 'buy' && me.coins >= est.cost && !boughtThisTurn;
-    const div = document.createElement('div');
-    div.className = `est-card est-${est.color}${canBuy?' buyable':''}${!isMyTurn()||phase!=='buy'?'':!canBuy?' cant-afford':''}`;
-    div.innerHTML = `
-      <span class="card-roll">[${est.roll.join('-')}]</span>
-      <div class="card-name"><span class="color-dot dot-${est.color}"></span>${est.name}</div>
-      <div class="card-effect">${est.desc}</div>
-      <div class="card-cost">◆ ${est.cost}</div>
-      <span class="card-count">×${count}</span>
-    `;
-    if (canBuy) div.onclick = () => buyEstablishment(eid, est.cost);
+function renderMarket(){
+  const grid=document.getElementById('mgrid');grid.innerHTML='';
+  const player=myP();
+  const vis=[...(gs.market.vis.low||[]),...(gs.market.vis.high||[])];
+  vis.forEach(eid=>{
+    const e=getE(eid);if(!e)return;
+    const initMode=gs.phase==='init'&&isMyTurn()&&!boughtThisTurn;
+    const buyMode=isMyTurn()&&gs.phase==='buy'&&!boughtThisTurn;
+    const canBuy=(initMode||buyMode)&&player.coins>=e.cost;
+    const cantAff=(initMode||buyMode)&&player.coins<e.cost;
+    const cc={blue:'ec-blue',green:'ec-green',red:'ec-red',purple:'ec-purple'}[e.type]||'ec-blue';
+    const dc={blue:'td-blue',green:'td-green',red:'td-red',purple:'td-purple'}[e.type]||'td-blue';
+    const div=document.createElement('div');
+    div.className=`ecard ${cc}${canBuy?' buyable':''}${cantAff?' cantaff':''}${!initMode&&!buyMode?' notturn':''}`;
+    div.innerHTML=`<div class="croll">${e.icon} [${e.roll.join(',')}]</div>
+      <div class="cname"><span class="tdot ${dc}"></span>${e.name}</div>
+      <div class="ceff">${e.eff}</div>
+      <div class="ccost">🪙 ${e.cost}</div>`;
+    if(canBuy)div.onclick=()=>gs.phase==='init'?buyInit(eid):buyEst(eid);
     grid.appendChild(div);
   });
-  if (grid.innerHTML === '') grid.innerHTML = '<div style="color:var(--gold-dark);font-size:0.85rem;">Market is empty.</div>';
+  if(!grid.innerHTML)grid.innerHTML='<div style="color:var(--mid);font-size:.95rem;font-weight:700;">Market is empty!</div>';
 }
 
-function renderLandmarks(me, phase) {
-  const grid = document.getElementById('my-landmarks');
-  grid.innerHTML = '';
-  LANDMARKS.forEach(lm => {
-    if (lm.built_start) return;
-    const built = me.landmarks[lm.id];
-    const canBuild = isMyTurn() && phase === 'buy' && !built && me.coins >= lm.cost && !boughtThisTurn;
-    const div = document.createElement('div');
-    div.className = `landmark-card${built?' built':''}${canBuild?' buildable':''}`;
-    div.innerHTML = `
-      <div class="lm-name">${lm.name}</div>
-      <div class="lm-cost">◆ ${lm.cost}</div>
-      <div class="lm-desc">${lm.desc}</div>
-      <div class="lm-status">${built ? '✓ Built' : `Cost: ${lm.cost} coins`}</div>
-    `;
-    if (canBuild) div.onclick = () => buildLandmark(lm.id, lm.cost);
+function renderLandmarks(){
+  const grid=document.getElementById('mlm');grid.innerHTML='';
+  const player=myP();
+  (gs.lmPool||[]).forEach(lid=>{
+    const lm=getL(lid);if(!lm)return;
+    const built=hasLm(player,lid);
+    const cost=lmCost(player,lid);
+    // Loan office special condition
+    if(lid==='loan_office'){
+      const noLmCount=gs.players.filter(p=>!p.lmCount||p.lmCount===0).length;
+      if(noLmCount!==1||player.lmCount>0)return;
+    }
+    const canBuild=isMyTurn()&&gs.phase==='buy'&&!boughtThisTurn&&!built&&player.coins>=cost;
+    const div=document.createElement('div');
+    div.className=`lcard${built?' built':''}${canBuild?' buildable':''}`;
+    const costsStr=lm.costs.map((c,i)=>`${['1st','2nd','3rd'][i]}: 🪙${c}`).join(' | ');
+    div.innerHTML=`<div class="lname">${lm.name}</div>
+      <div class="lcosts">${costsStr}</div>
+      <div class="leff">${lm.eff}</div>
+      <div class="lstatus">${built?'✅ Built':`Build for 🪙${cost}`}</div>`;
+    if(canBuild)div.onclick=()=>buildLm(lid);
     grid.appendChild(div);
   });
 }
 
-function renderMyEstablishments(me) {
-  const grid = document.getElementById('my-establishments');
-  grid.innerHTML = '';
-  const owned = me.establishments || {};
-  if (Object.keys(owned).length === 0) {
-    grid.innerHTML = '<span style="color:var(--gold-dark);font-size:0.85rem;">None</span>';
-    return;
-  }
-  Object.keys(owned).forEach(eid => {
-    const cnt = owned[eid];
-    if (!cnt) return;
-    const est = ESTABLISHMENTS.find(e => e.id === eid);
-    if (!est) return;
-    const span = document.createElement('span');
-    span.className = `my-est-pill ${est.color}`;
-    span.textContent = `${est.name} ×${cnt}`;
-    grid.appendChild(span);
+function renderSide(){
+  const p=myP();
+  document.getElementById('mcoins').textContent=`🪙 ${p.coins} coins | 🏛️ ${p.lmCount||0}/3 landmarks`;
+  const grid=document.getElementById('mests');grid.innerHTML='';
+  const owned=p.ests||{};
+  if(!Object.keys(owned).length){grid.innerHTML='<span style="color:var(--mid);font-size:.85rem;">No establishments yet</span>';}
+  else Object.keys(owned).forEach(eid=>{
+    const cnt=owned[eid];if(!cnt)return;
+    const e=getE(eid);if(!e)return;
+    const cl={blue:'blue',green:'green',red:'red',purple:'purple'}[e.type]||'blue';
+    const sp=document.createElement('span');sp.className=`mpill ${cl}`;sp.textContent=`${e.name} ×${cnt}`;
+    grid.appendChild(sp);
+  });
+  const op=document.getElementById('oplayers');op.innerHTML='';
+  gs.players.forEach((p2,i)=>{
+    if(p2.name===myName)return;
+    const act=gs.phase==='init'?i===gs.initIdx:i===gs.curIdx;
+    const d=document.createElement('div');d.className='opcard';
+    d.innerHTML=`<div class="opname" style="color:${p2.color};">${p2.name}${act?' ⭐':''}</div>
+      <div class="opinfo">🪙 ${p2.coins} | 🏛️ ${p2.lmCount||0}/3</div>`;
+    op.appendChild(d);
   });
 }
 
-function renderOtherPlayers() {
-  const div = document.getElementById('other-players-info');
-  div.innerHTML = '';
-  gameState.players.forEach((p,i) => {
-    if (p.name === myName) return;
-    const lmBuilt = LANDMARKS.filter(lm => !lm.built_start && p.landmarks[lm.id]).length;
-    const lmTotal = LANDMARKS.filter(lm => !lm.built_start).length;
-    const d = document.createElement('div');
-    d.style.cssText = 'margin-bottom:0.7rem;';
-    d.innerHTML = `<div style="font-size:0.82rem;color:var(--gold-light);font-weight:600;">${p.name} ${i===gameState.currentPlayerIdx?'⭐':''}</div>
-      <div style="font-size:0.75rem;color:var(--parchment-dark);">◆ ${p.coins} coins · ${lmBuilt}/${lmTotal} landmarks</div>`;
-    div.appendChild(d);
-  });
+// ── INITIAL BUILD ──
+async function buyInit(eid){
+  if(!isMyTurn()||gs.phase!=='init'||boughtThisTurn)return;
+  const player=myP();const e=getE(eid);
+  if(!e||player.coins<e.cost)return;
+  player.coins-=e.cost;
+  player.ests[eid]=(player.ests[eid]||0)+1;
+  removeFromMarket(eid);boughtThisTurn=true;
+  gs.log.push({msg:`${myName} built ${e.name} (🪙${e.cost})`,cls:'log-you'});
+  advanceInit();
+  await push();render();syncLog();
 }
-
-// --- ACTIONS ---
-async function rollDice(numDice) {
-  if (!isMyTurn()) return;
-  const me = myPlayer();
-  const dice = [];
-  for (let i = 0; i < numDice; i++) dice.push(Math.floor(Math.random()*6)+1);
-
-  // Harbor: if total >= 10 and player has harbor, add 2
-  let total = dice.reduce((a,b)=>a+b,0);
-  if (me.landmarks['harbor'] && total >= 10) total += 2;
-
-  showDice(dice, true);
-  diceValues = dice;
-
-  // Apply income effects
-  const logEntries = applyDiceEffects(dice, total);
-
-  // Check amusement park (re-roll on doubles)
-  const doubles = numDice === 2 && dice[0] === dice[1];
-
-  gameState.lastDice = dice;
-  gameState.lastDiceTotal = total;
-  gameState.turnPhase = 'buy';
-  gameState.lastAction = Date.now();
-
-  // City Hall: if 0 coins, get 1
-  if (me.coins === 0 && me.landmarks['city_hall']) {
-    me.coins += 1;
-    logEntries.push({ msg: `${myName}: City Hall gives 1 coin.`, player: myName });
-  }
-
-  logEntries.forEach(e => gameState.log.push(e));
-  gameState.log.push({ msg: `${myName} rolled [${dice.join('+')}] = ${total}`, player: myName });
-
-  await pushGameState();
-  renderGame();
-
-  // After render, offer re-roll if radio tower
-  if (me.landmarks['radio_tower'] && !rerolledThisTurn) {
-    setTimeout(() => {
-      if (confirm('Use Radio Tower to re-roll?')) {
-        rerolledThisTurn = true;
-        gameState.turnPhase = 'roll';
-        gameState.lastDice = null;
-        renderGame();
-      }
-    }, 800);
-  }
-
-  // Amusement park doubles notification
-  if (doubles && me.landmarks['amusement'] && !extraTurnUsed) {
-    setTimeout(() => showModal('Amusement Park!', 'You rolled doubles! You get an extra turn after this one.'), 900);
-  }
-}
-
-function applyDiceEffects(dice, total) {
-  const entries = [];
-  const players = gameState.players;
-  const curIdx = gameState.currentPlayerIdx;
-  const cur = players[curIdx];
-
-  // Process establishments in order: red (other players) → green/blue (everyone or you) → purple (current player)
-  // Red cards — activated when it's someone ELSE's turn
-  players.forEach((p, pi) => {
-    if (pi === curIdx) return;
-    ['cafe','restaurant'].forEach(eid => {
-      const cnt = p.establishments[eid] || 0;
-      if (!cnt) return;
-      const est = ESTABLISHMENTS.find(e => e.id === eid);
-      if (!est.roll.includes(total)) return;
-      let take = eid === 'cafe' ? 1 : 2;
-      if (cur.landmarks['shopping']) take += 1;
-      const actual = Math.min(take * cnt, cur.coins);
-      cur.coins -= actual;
-      p.coins += actual;
-      entries.push({ msg: `${p.name}'s ${est.name}: took ${actual} coin(s) from ${cur.name}`, player: p.name });
-    });
-  });
-
-  // Blue cards — activated for ALL players
-  players.forEach((p, pi) => {
-    ['wheat','ranch','forest','mine','appletv'].forEach(eid => {
-      const cnt = p.establishments[eid] || 0;
-      if (!cnt) return;
-      const est = ESTABLISHMENTS.find(e => e.id === eid);
-      if (!est.roll.includes(total)) return;
-      let income = eid==='mine'?5 : eid==='appletv'?3 : 1;
-      p.coins += income * cnt;
-      entries.push({ msg: `${p.name}'s ${est.name} (×${cnt}): +${income*cnt} coin(s)`, player: p.name });
-    });
-  });
-
-  // Green cards — only current player
-  ['bakery','conveni','fruitvg','cheesefc','furnitfc'].forEach(eid => {
-    const cnt = cur.establishments[eid] || 0;
-    if (!cnt) return;
-    const est = ESTABLISHMENTS.find(e => e.id === eid);
-    if (!est.roll.includes(total)) return;
-    let income = 0;
-    if (eid === 'bakery') income = 1;
-    else if (eid === 'conveni') income = 3;
-    else if (eid === 'fruitvg') {
-      const wf = cur.establishments['wheat']||0;
-      const rn = cur.establishments['ranch']||0;
-      income = (wf + rn);
+function advanceInit(){
+  const n=gs.players.length;
+  gs.initIdx=(gs.initIdx+1)%n;
+  if(gs.initIdx===0){
+    gs.initRoundsLeft--;
+    if(gs.initRoundsLeft<=0){
+      gs.phase='roll';gs.curIdx=0;
+      gs.log.push({msg:'🎉 Initial building done! Main game starts!',cls:'log-sys'});
+      gs.log.push({msg:`${gs.players[0].name}'s turn — roll the dice!`,cls:'log-sys'});
+    }else{
+      const rd=4-gs.initRoundsLeft;
+      gs.log.push({msg:`🏗️ Initial Building Round ${rd}/3`,cls:'log-sys'});
+      gs.log.push({msg:`${gs.players[0].name}: choose an establishment.`,cls:'log-sys'});
     }
-    else if (eid === 'cheesefc') income = 3 * (cur.establishments['ranch']||0);
-    else if (eid === 'furnitfc') income = 3 * ((cur.establishments['forest']||0)+(cur.establishments['mine']||0));
-    if (cur.landmarks['shopping']) income += cnt;
-    cur.coins += income * cnt;
-    entries.push({ msg: `${cur.name}'s ${est.name} (×${cnt}): +${income*cnt} coin(s)`, player: cur.name });
-  });
+  }else{
+    gs.log.push({msg:`${gs.players[gs.initIdx].name}: choose an establishment.`,cls:'log-sys'});
+  }
+  boughtThisTurn=false;
+}
 
-  // Purple — only current player, affects others
-  ['stadium','tvstation','bizcentr'].forEach(eid => {
-    const cnt = cur.establishments[eid] || 0;
-    if (!cnt) return;
-    const est = ESTABLISHMENTS.find(e => e.id === eid);
-    if (!est.roll.includes(total)) return;
-    if (eid === 'stadium') {
-      let total_take = 0;
-      players.forEach((p,pi) => {
-        if (pi===curIdx) return;
-        const take = Math.min(2, p.coins);
-        p.coins -= take; cur.coins += take; total_take += take;
+// ── ROLL ──
+async function rollDice(nd){
+  if(!isMyTurn()||gs.phase!=='roll')return;
+  const dice=Array.from({length:nd},()=>Math.floor(Math.random()*6)+1);
+  const total=dice.reduce((a,b)=>a+b,0);
+  const doubles=nd===2&&dice[0]===dice[1];
+  showDice(dice,true);
+  gs.lastDice=dice;gs.lastTotal=total;
+
+  setTimeout(async()=>{
+    const entries=applyIncome(total,dice,doubles);
+    entries.forEach(e=>gs.log.push(e));
+
+    // Tech Startup — all players with it get 8 coins on roll of 12
+    if(total===12){
+      gs.players.forEach(p=>{
+        if(hasLm(p,'tech_startup')){p.coins+=8;gs.log.push({msg:`${p.name}'s Tech Startup: +8 coins!`,cls:'log-you'});}
       });
-      entries.push({ msg: `${cur.name}'s Stadium: took 2 coins from each player (total ${total_take})`, player: cur.name });
     }
-    // TV station and Biz Center require player interaction — handled separately
+    // Charterhouse — current player gets 3 coins if earned nothing with 2 dice
+    if(nd===2&&hasLm(myP(),'charterhouse')){
+      const earned=entries.filter(e=>e.positive&&e.player===myName).length;
+      if(earned===0){myP().coins+=3;gs.log.push({msg:`${myName}'s Charterhouse: +3 coins (earned nothing)!`,cls:'log-you'});}
+    }
+    // Temple — if doubles, all players who own temple take 2 from each opponent
+    if(doubles){
+      gs.players.forEach(p=>{
+        if(hasLm(p,'temple')){let t=0;gs.players.forEach(o=>{if(o.name===p.name)return;const a=Math.min(2,o.coins);o.coins-=a;p.coins+=a;t+=a;});
+          if(t>0)gs.log.push({msg:`${p.name}'s Temple (doubles!): +${t} coins`,cls:'log-you'});}
+      });
+    }
+    // Moving Company — current player gives 1 est to player on right if doubles
+    if(doubles&&hasLm(myP(),'moving_co')){
+      const owned=Object.keys(myP().ests).filter(k=>myP().ests[k]>0);
+      if(owned.length>0){
+        const rIdx=(myIdx()-1+gs.players.length)%gs.players.length;
+        const gid=owned[0];myP().ests[gid]--;
+        if(myP().ests[gid]===0)delete myP().ests[gid];
+        gs.players[rIdx].ests[gid]=(gs.players[rIdx].ests[gid]||0)+1;
+        gs.log.push({msg:`${myName}'s Moving Company: gave ${getE(gid).name} to ${gs.players[rIdx].name}`,cls:'log-bad'});
+      }
+    }
+
+    gs.log.push({msg:`${myName} rolled [${dice.join('+')}]=${total}${doubles?' 🎲🎲 DOUBLES!':''}`,cls:'log-you'});
+    gs.phase='buy';boughtThisTurn=false;
+    extraTurn=doubles&&hasLm(myP(),'amusement_pk');
+    radioTower=false;
+    if(extraTurn)popup('🎡 Amusement Park! You get another turn!');
+    await push();render();syncLog();
+  },720);
+}
+
+// ── INCOME ENGINE ──
+function applyIncome(total,dice,doubles){
+  const entries=[];
+  const ci=gs.curIdx;const cur=gs.players[ci];
+
+  // 1. RED — activate for non-current players (when it's someone else's turn)
+  gs.players.forEach((p,pi)=>{
+    if(pi===ci)return;
+    const redIds=['sushi_bar','cafe','hamburger','family_rest'];
+    redIds.forEach(eid=>{
+      const cnt=p.ests[eid]||0;if(!cnt)return;
+      const e=getE(eid);if(!e.roll.includes(total))return;
+      let take=eid==='sushi_bar'?3:2;
+      if(hasLm(p,'soda_plant'))take+=1; // soda plant boosts cup income
+      const actual=Math.min(take*cnt,cur.coins);
+      cur.coins-=actual;p.coins+=actual;
+      entries.push({msg:`${p.name}'s ${e.name}(×${cnt}): took ${actual} from ${cur.name}`,cls:p.name===myName?'log-you':'log-bad',positive:p.name===myName,player:p.name});
+    });
+  });
+
+  // 2. BLUE — activate for ALL players
+  gs.players.forEach(p=>{
+    const blueIds=['wheat_field','vineyard','flower_gdn','forest','corn_field','apple_orch','mine'];
+    blueIds.forEach(eid=>{
+      const cnt=p.ests[eid]||0;if(!cnt)return;
+      const e=getE(eid);if(!e.roll.includes(total))return;
+      let inc=eid==='wheat_field'?1:eid==='vineyard'?2:eid==='flower_gdn'?2:eid==='forest'?2:eid==='corn_field'?3:eid==='apple_orch'?3:eid==='mine'?6:1;
+      if(hasLm(p,'farmers_mkt')&&e.icon==='🌾')inc+=1;
+      if(hasLm(p,'forge')&&e.icon==='⚙️')inc+=1;
+      const tot=inc*cnt;p.coins+=tot;
+      entries.push({msg:`${p.name}'s ${e.name}(×${cnt}): +${tot}`,cls:p.name===myName?'log-you':'',positive:true,player:p.name});
+    });
+  });
+
+  // 3. GREEN — current player only
+  const greenIds=['bakery','convenience','flower_shop','furniture','winery','food_wh'];
+  greenIds.forEach(eid=>{
+    const cnt=cur.ests[eid]||0;if(!cnt)return;
+    const e=getE(eid);if(!e.roll.includes(total))return;
+    let inc=0;
+    if(eid==='bakery')inc=2;
+    else if(eid==='convenience')inc=3;
+    else if(eid==='flower_shop')inc=(['flower_gdn'].reduce((s,f)=>s+(cur.ests[f]||0),0))*3;
+    else if(eid==='furniture')inc=(['forest','mine'].reduce((s,f)=>s+(cur.ests[f]||0),0))*4;
+    else if(eid==='winery')inc=(cur.ests['vineyard']||0)*3;
+    else if(eid==='food_wh')inc=(['sushi_bar','cafe','hamburger','family_rest'].reduce((s,f)=>s+(cur.ests[f]||0),0))*2;
+    if(hasLm(cur,'shop_mall')&&e.icon==='🏪')inc+=cnt;
+    const tot=inc*cnt;if(tot===0)return;
+    cur.coins+=tot;
+    entries.push({msg:`${cur.name}'s ${e.name}(×${cnt}): +${tot}`,cls:'log-you',positive:true,player:cur.name});
+  });
+
+  // 4. PURPLE — current player only
+  ['stadium','biz_center','shop_dist'].forEach(eid=>{
+    const cnt=cur.ests[eid]||0;if(!cnt)return;
+    const e=getE(eid);if(!e.roll.includes(total))return;
+    if(eid==='stadium'){
+      let t=0;gs.players.forEach((p,pi)=>{if(pi===ci)return;const a=Math.min(3*cnt,p.coins);p.coins-=a;cur.coins+=a;t+=a;});
+      entries.push({msg:`${cur.name}'s Stadium: took ${t} coins total`,cls:'log-you',positive:true,player:cur.name});
+    }else if(eid==='shop_dist'){
+      let t=0;gs.players.forEach((p,pi)=>{if(pi===ci||p.coins<=10)return;const a=Math.floor(p.coins/2);p.coins-=a;cur.coins+=a;t+=a;});
+      if(t>0)entries.push({msg:`${cur.name}'s Shopping District: took ${t} coins`,cls:'log-you',positive:true,player:cur.name});
+    }
   });
 
   return entries;
 }
 
-async function buyEstablishment(eid, cost) {
-  if (!isMyTurn() || boughtThisTurn) return;
-  const me = myPlayer();
-  if (me.coins < cost) return;
-  me.coins -= cost;
-  me.establishments[eid] = (me.establishments[eid] || 0) + 1;
-  gameState.market[eid] = Math.max(0, (gameState.market[eid]||0) - 1);
-  boughtThisTurn = true;
-  gameState.log.push({ msg: `${myName} bought ${ESTABLISHMENTS.find(e=>e.id===eid).name} for ${cost} coins`, player: myName });
-  gameState.lastAction = Date.now();
-  await pushGameState();
-  renderGame();
-}
-
-async function buildLandmark(lid, cost) {
-  if (!isMyTurn() || boughtThisTurn) return;
-  const me = myPlayer();
-  if (me.coins < cost || me.landmarks[lid]) return;
-  me.coins -= cost;
-  me.landmarks[lid] = true;
-  boughtThisTurn = true;
-  gameState.log.push({ msg: `${myName} built the ${LANDMARKS.find(l=>l.id===lid).name}!`, player: myName });
-  gameState.lastAction = Date.now();
-
-  // Check win condition
-  const lmToBuild = LANDMARKS.filter(l => !l.built_start);
-  const allBuilt = lmToBuild.every(l => me.landmarks[l.id]);
-  if (allBuilt) {
-    gameState.winner = myName;
-    gameState.log.push({ msg: `🏆 ${myName} has built all landmarks and WINS!` });
-    gameState.lastAction = Date.now();
-    await pushGameState();
-    showWinner(myName);
-    return;
-  }
-
-  await pushGameState();
-  renderGame();
-}
-
-async function endTurn() {
-  if (!isMyTurn()) return;
-  const me = myPlayer();
-
-  // Airport: if built nothing, get 10 coins
-  if (me.landmarks['airport'] && !boughtThisTurn) {
-    me.coins += 10;
-    gameState.log.push({ msg: `${myName}: Airport gives 10 coins for not building.`, player: myName });
-  }
-
-  // Amusement park: if doubles and not used extra turn
-  const dice = gameState.lastDice || [];
-  const doubles = dice.length === 2 && dice[0] === dice[1];
-  if (doubles && me.landmarks['amusement'] && !extraTurnUsed) {
-    extraTurnUsed = true;
-    gameState.turnPhase = 'roll';
-    gameState.lastDice = null;
-    gameState.log.push({ msg: `${myName} gets an extra turn (Amusement Park)!`, player: myName });
-    gameState.lastAction = Date.now();
-    boughtThisTurn = false;
-    await pushGameState();
-    renderGame();
-    return;
-  }
-
-  // Advance to next player
-  const next = (gameState.currentPlayerIdx + 1) % gameState.players.length;
-  gameState.currentPlayerIdx = next;
-  gameState.turnPhase = 'roll';
-  gameState.lastDice = null;
-  gameState.log.push({ msg: `--- ${gameState.players[next].name}'s turn ---` });
-  gameState.lastAction = Date.now();
-  boughtThisTurn = false; rerolledThisTurn = false; extraTurnUsed = false;
-  await pushGameState();
-  renderGame();
-}
-
-async function pushGameState() {
-  const room = await loadRoom(roomCode);
-  if (!room) return;
-  room.gameState = gameState;
-  room.lastUpdate = Date.now();
-  await saveRoom(roomCode, room);
-}
-
-function showWinner(name) {
-  document.getElementById('winner-name').textContent = name;
-  document.getElementById('winner-screen').style.display = 'flex';
-}
-
-// Check for winner when rendering
-function checkWinner() {
-  if (gameState && gameState.winner) {
-    showWinner(gameState.winner);
+// ── REMOVE FROM MARKET ──
+function removeFromMarket(eid){
+  const e=getE(eid);const isLow=Math.max(...e.roll)<=6;
+  const vis=isLow?gs.market.vis.low:gs.market.vis.high;
+  const sup=isLow?gs.market.supply.low:gs.market.supply.high;
+  const idx=vis.indexOf(eid);
+  if(idx!==-1){
+    vis.splice(idx,1);
+    let refilled=false;
+    while(sup.length>0&&!refilled){const n=sup.shift();if(!vis.includes(n)){vis.push(n);refilled=true;}}
   }
 }
 
-// Patch renderGame to check winner
-const _origRenderGame = renderGame;
-window.renderGame = function() {
-  _origRenderGame();
-  checkWinner();
+// ── BUY EST ──
+async function buyEst(eid){
+  if(!isMyTurn()||gs.phase!=='buy'||boughtThisTurn)return;
+  const player=myP();const e=getE(eid);
+  if(!e||player.coins<e.cost)return;
+  player.coins-=e.cost;player.ests[eid]=(player.ests[eid]||0)+1;
+  removeFromMarket(eid);boughtThisTurn=true;
+  gs.log.push({msg:`${myName} bought ${e.name} for 🪙${e.cost}`,cls:'log-you'});
+  await push();render();syncLog();
+}
+
+// ── BUILD LANDMARK ──
+async function buildLm(lid){
+  if(!isMyTurn()||gs.phase!=='buy'||boughtThisTurn)return;
+  const player=myP();const lm=getL(lid);
+  if(!lm||hasLm(player,lid))return;
+  const cost=lmCost(player,lid);
+  if(player.coins<cost)return;
+  player.coins-=cost;
+  if(!player.landmarks)player.landmarks=[];
+  player.landmarks.push(lid);
+  player.lmCount=(player.lmCount||0)+1;
+  boughtThisTurn=true;
+  gs.log.push({msg:`${myName} built ${lm.name} (🪙${cost})! 🏛️ ${player.lmCount}/3`,cls:'log-you'});
+
+  // Immediate landmark effects
+  applyImmediateLm(lid,player);
+
+  // Win: Launch Pad or 3 landmarks
+  if(lid==='launch_pad'||player.lmCount>=3){
+    gs.winner=myName;
+    gs.log.push({msg:`🏆 ${myName} wins!${lid==='launch_pad'?' (Launch Pad!)':`(3 landmarks!)`}`,cls:'log-sys'});
+    await push();showWinner(myName);return;
+  }
+  await push();render();syncLog();
+}
+
+function applyImmediateLm(lid,player){
+  const lm=getL(lid);if(lm.timing!=='immediate')return;
+  if(lid==='exhibit_hall'){
+    let t=0;gs.players.forEach(p=>{if(p.name===player.name||p.coins<=10)return;const a=Math.floor(p.coins/2);p.coins-=a;player.coins+=a;t+=a;});
+    gs.log.push({msg:`${player.name}'s Exhibit Hall: took ${t} coins from rich opponents!`,cls:'log-you'});
+  }else if(lid==='french_rest'){
+    let t=0;gs.players.forEach(p=>{if(p.name===player.name)return;const a=Math.min(2,p.coins);p.coins-=a;player.coins+=a;t+=a;});
+    gs.log.push({msg:`${player.name}'s French Restaurant: took ${t} coins!`,cls:'log-you'});
+  }else if(lid==='museum'){
+    let t=0;gs.players.forEach(p=>{if(p.name===player.name)return;const a=Math.min((p.lmCount||0)*3,p.coins);p.coins-=a;player.coins+=a;t+=a;});
+    gs.log.push({msg:`${player.name}'s Museum: took ${t} coins!`,cls:'log-you'});
+  }else if(lid==='park'){
+    const total=gs.players.reduce((s,p)=>s+p.coins,0);const each=Math.floor(total/gs.players.length);
+    gs.players.forEach(p=>p.coins=each);
+    gs.log.push({msg:`${player.name}'s Park: coins redistributed (${each} each)!`,cls:'log-sys'});
+  }else if(lid==='publisher'){
+    const se=['bakery','convenience','flower_shop','furniture','winery','food_wh'];
+    let t=0;gs.players.forEach(p=>{if(p.name===player.name)return;const cnt=se.reduce((s,e)=>s+(p.ests[e]||0),0);const a=Math.min(cnt,p.coins);p.coins-=a;player.coins+=a;t+=a;});
+    gs.log.push({msg:`${player.name}'s Publisher: took ${t} coins!`,cls:'log-you'});
+  }else if(lid==='tv_station'){
+    const ce=['sushi_bar','cafe','hamburger','family_rest'];
+    let t=0;gs.players.forEach(p=>{if(p.name===player.name)return;const cnt=ce.reduce((s,e)=>s+(p.ests[e]||0),0);const a=Math.min(cnt,p.coins);p.coins-=a;player.coins+=a;t+=a;});
+    gs.log.push({msg:`${player.name}'s TV Station: took ${t} coins!`,cls:'log-you'});
+  }else if(lid==='radio_tower'){
+    radioTower=true;
+    gs.log.push({msg:`${player.name}'s Radio Tower: take another turn!`,cls:'log-you'});
+  }
+}
+
+// ── END TURN ──
+async function endTurn(){
+  if(!isMyTurn()||gs.phase!=='buy')return;
+  const player=myP();
+  // Airport: no build = +5
+  if(!boughtThisTurn&&hasLm(player,'airport')){
+    player.coins+=5;gs.log.push({msg:`${myName}'s Airport: +5 coins for not building!`,cls:'log-you'});
+  }
+  // Radio Tower: extra turn
+  if(radioTower){radioTower=false;gs.phase='roll';gs.lastDice=null;gs.lastTotal=null;boughtThisTurn=false;
+    gs.log.push({msg:`${myName} takes another turn (Radio Tower)!`,cls:'log-sys'});await push();render();syncLog();return;}
+  // Amusement Park doubles
+  if(extraTurn){extraTurn=false;gs.phase='roll';gs.lastDice=null;gs.lastTotal=null;boughtThisTurn=false;
+    gs.log.push({msg:`${myName} takes another turn (Amusement Park doubles)!`,cls:'log-sys'});await push();render();syncLog();return;}
+  // Next player
+  const next=(gs.curIdx+1)%gs.players.length;
+  gs.curIdx=next;gs.phase='roll';gs.lastDice=null;gs.lastTotal=null;
+  boughtThisTurn=false;extraTurn=false;radioTower=false;
+  gs.log.push({msg:`─── ${gs.players[next].name}'s turn ───`,cls:'log-sys'});
+  await push();render();syncLog();
+}
+
+function showWinner(name){
+  document.getElementById('wname').textContent=name;
+  document.getElementById('wscreen').style.display='flex';
 }
 </script>
 </body>
