@@ -91,8 +91,8 @@ select option{background:#fff;}
 .abtn.red{background:var(--red);box-shadow:0 4px 0 var(--red-dark);}
 
 /* MARKET */
-.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:.65rem;margin-bottom:1.1rem;}
-.ecard{border-radius:14px;padding:.7rem;cursor:pointer;border:3px solid transparent;transition:transform .15s,box-shadow .15s;position:relative;min-height:115px;display:flex;flex-direction:column;box-shadow:0 3px 10px rgba(0,0,0,.1);}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:.75rem;margin-bottom:1.1rem;}
+.ecard{border-radius:14px;padding:.85rem;cursor:pointer;border:3px solid transparent;transition:transform .15s,box-shadow .15s;position:relative;min-height:140px;display:flex;flex-direction:column;box-shadow:0 3px 10px rgba(0,0,0,.1);}
 .ecard:hover.buyable{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.2);}
 .ecard.buyable{border-color:var(--sun)!important;cursor:pointer;}
 .ecard.cantaff{opacity:.55;cursor:not-allowed;}
@@ -101,24 +101,24 @@ select option{background:#fff;}
 .ec-green{background:#d4f5e0;border-color:#70d8a0;}
 .ec-red{background:#ffe0de;border-color:#f09898;}
 .ec-purple{background:#ecdcff;border-color:#c090f0;}
-.croll{font-size:.75rem;color:var(--mid);font-weight:800;}
-.cname{font-size:.82rem;font-weight:800;color:var(--txt);flex:1;margin:3px 0;line-height:1.25;}
-.ceff{font-size:.67rem;color:var(--mid);line-height:1.3;}
-.ccost{font-size:.9rem;font-weight:800;color:var(--sky-dark);margin-top:auto;}
+.croll{font-size:.82rem;color:var(--mid);font-weight:800;}
+.cname{font-size:.9rem;font-weight:800;color:var(--txt);flex:1;margin:4px 0;line-height:1.3;}
+.ceff{font-size:.74rem;color:var(--mid);line-height:1.35;}
+.ccost{font-size:1rem;font-weight:800;color:var(--sky-dark);margin-top:auto;}
 .ccount{position:absolute;top:5px;right:7px;font-size:.72rem;background:var(--sky);color:#fff;border-radius:10px;padding:1px 7px;font-weight:800;}
 .tdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;vertical-align:middle;}
 .td-blue{background:#3a8fd4;}.td-green{background:#2eb872;}.td-red{background:#e8423a;}.td-purple{background:#8b3fbf;}
 
 /* LANDMARKS */
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.65rem;margin-bottom:1.1rem;}
-.lcard{border-radius:14px;padding:.75rem;border:3px solid #ccc;background:#f8f8f8;cursor:pointer;transition:border-color .2s,transform .15s;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.75rem;margin-bottom:1.1rem;}
+.lcard{border-radius:14px;padding:1rem;border:3px solid #ccc;background:#f8f8f8;cursor:pointer;transition:border-color .2s,transform .15s;box-shadow:0 2px 8px rgba(0,0,0,.08);}
 .lcard.built{background:#fffbe0;border-color:var(--sun)!important;}
 .lcard.buildable{border-color:var(--green)!important;}
 .lcard:hover.buildable{transform:translateY(-3px);}
-.lname{font-size:.85rem;font-weight:800;color:var(--txt);}
-.lcosts{font-size:.74rem;color:var(--sky);font-weight:700;margin:.2rem 0;}
-.leff{font-size:.67rem;color:var(--mid);line-height:1.25;}
-.lstatus{font-size:.72rem;margin-top:.3rem;font-weight:800;}
+.lname{font-size:.95rem;font-weight:800;color:var(--txt);}
+.lcosts{font-size:.8rem;color:var(--sky);font-weight:700;margin:.3rem 0;}
+.leff{font-size:.74rem;color:var(--mid);line-height:1.3;}
+.lstatus{font-size:.8rem;margin-top:.4rem;font-weight:800;}
 .lcard.built .lstatus{color:var(--green);}
 .lcard:not(.built) .lstatus{color:var(--mid);}
 
@@ -555,10 +555,41 @@ async function push(){
   await saveRoom(roomCode,window._roomMeta);
 }
 
+
+// ── TURN NOTIFICATION SOUND ──
+let _lastWasMyTurn = false;
+function playTurnChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // Two soft ascending notes
+    function playNote(freq, startTime, duration, gain) {
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+      gainNode.gain.setValueAtTime(0, startTime);
+      gainNode.gain.linearRampToValueAtTime(gain, startTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    }
+    const now = ctx.currentTime;
+    playNote(523, now, 0.35, 0.18);       // C5
+    playNote(659, now + 0.18, 0.4, 0.14); // E5
+    playNote(784, now + 0.34, 0.5, 0.10); // G5
+  } catch(e) {}
+}
+
 // ── RENDER ──
 function render(){
   if(!gs)return;
   if(gs.winner){showWinner(gs.winner);return;}
+  // Play chime when it first becomes your turn
+  const nowMyTurn = isMyTurn() && (gs.phase === 'roll' || gs.phase === 'init');
+  if(nowMyTurn && !_lastWasMyTurn) playTurnChime();
+  _lastWasMyTurn = nowMyTurn;
   renderTopBar();renderBanner();renderDice();renderMarket();renderLandmarks();renderSide();
 }
 
@@ -625,10 +656,13 @@ function renderMarket(){
     const dc={blue:'td-blue',green:'td-green',red:'td-red',purple:'td-purple'}[e.type]||'td-blue';
     const div=document.createElement('div');
     div.className='ecard '+cc+(canBuy?' buyable':'')+(cantAff?' cantaff':'')+((!initMode&&!buyMode)?' notturn':'');
+    var typeLabels={blue:'🔵 Anyone's roll',green:'🟢 Your roll only',red:'🔴 Others' roll',purple:'🟣 Your roll only'};
+    var typeLabel=typeLabels[e.type]||'';
     div.innerHTML='<div class="croll">'+e.icon+' ['+e.roll.join(',')+']</div>'
       +'<div class="cname"><span class="tdot '+dc+'"></span>'+e.name+'</div>'
       +'<div class="ceff">'+e.eff+'</div>'
-      +'<div class="ccost">🪙 '+e.cost+'</div>';
+      +'<div class="ccost">🪙 '+e.cost+'</div>'
+      +'<div style="font-size:.6rem;font-weight:700;margin-top:3px;opacity:.75;">'+typeLabel+'</div>';
     if(canBuy)div.onclick=(function(id){return function(){initMode?buyInit(id):buyEst(id);};})(eid);
     return div;
   }
@@ -675,6 +709,36 @@ function renderLandmarks(){
   });
 }
 
+function getIncomeStr(eid){
+  const e=getE(eid);if(!e)return '';
+  if(e.type==='red'){const amt=eid==='sushi_bar'?3:2;return '🪙-'+amt+' (opp turn)';}
+  if(e.type==='purple'){
+    if(eid==='stadium')return '🪙+3 per opp (your turn)';
+    if(eid==='biz_center')return 'swap est (your turn)';
+    if(eid==='shop_dist')return '½🪙 per opp>10 (your turn)';
+    return '';
+  }
+  var inc=0;
+  if(eid==='wheat_field')inc=1;
+  else if(eid==='vineyard')inc=2;
+  else if(eid==='flower_gdn')inc=2;
+  else if(eid==='forest')inc=2;
+  else if(eid==='corn_field')inc=3;
+  else if(eid==='apple_orch')inc=3;
+  else if(eid==='mine')inc=6;
+  else if(eid==='bakery')inc=2;
+  else if(eid==='convenience')inc=3;
+  else if(eid==='flower_shop')return '🪙+3 per 🌸(flower) card';
+  else if(eid==='furniture')return '🪙+4 per ⚙️(gear) card';
+  else if(eid==='winery')return '🪙+3 per 🍇(vine) card';
+  else if(eid==='food_wh')return '🪙+2 per ☕(cup) card';
+  return inc?'🪙+'+inc+' (any turn)':'';
+}
+
+function getTypeIcon(type){
+  return {blue:'🔵',green:'🟢',red:'🔴',purple:'🟣'}[type]||'⚪';
+}
+
 function renderSide(){
   const p=myP();
   document.getElementById('mcoins').textContent=`🪙 ${p.coins} coins | 🏛️ ${p.lmCount||0}/3 landmarks`;
@@ -687,36 +751,12 @@ function renderSide(){
     const cl={blue:'blue',green:'green',red:'red',purple:'purple'}[e.type]||'blue';
     // Work out the base coin income for display
     let incomeStr='';
-    if(e.type==='red'){
-      const amt=eid==='sushi_bar'?3:2;
-      incomeStr=`-${amt} opp`;
-    } else if(e.type==='purple'){
-      if(eid==='stadium')incomeStr='+3/opp';
-      else if(eid==='biz_center')incomeStr='swap';
-      else if(eid==='shop_dist')incomeStr='½ opp';
-    } else {
-      let inc=0;
-      if(eid==='wheat_field')inc=1;
-      else if(eid==='vineyard')inc=2;
-      else if(eid==='flower_gdn')inc=2;
-      else if(eid==='forest')inc=2;
-      else if(eid==='corn_field')inc=3;
-      else if(eid==='apple_orch')inc=3;
-      else if(eid==='mine')inc=6;
-      else if(eid==='bakery')inc=2;
-      else if(eid==='convenience')inc=3;
-      else if(eid==='flower_shop')inc='3/🌸';
-      else if(eid==='furniture')inc='4/⚙️';
-      else if(eid==='winery')inc='3/🍇';
-      else if(eid==='food_wh')inc='2/☕';
-      if(inc)incomeStr=`+${inc}`;
-    }
-    const rollStr=`[${e.roll.join(',')}]`;
+    incomeStr=getIncomeStr(eid);
     const sp=document.createElement('div');
-    sp.className=`mpill ${cl}`;
+    sp.className='mpill '+cl;
     sp.style.cssText='display:flex;flex-direction:column;gap:1px;min-width:90px;';
-    sp.innerHTML=`<span style="font-weight:800;">${e.name}${cnt>1?' ×'+cnt:''}</span>
-      <span style="font-size:.7rem;opacity:.85;">${rollStr} ${incomeStr}</span>`;
+    sp.innerHTML='<span style="font-weight:800;">'+getTypeIcon(e.type)+' '+e.name+(cnt>1?' ×'+cnt:'')+'</span>'
+      +'<span style="font-size:.7rem;opacity:.85;">🎲['+e.roll.join(',')+'] '+incomeStr+'</span>';
     grid.appendChild(sp);
   });
   const op=document.getElementById('oplayers');op.innerHTML='';
@@ -724,8 +764,22 @@ function renderSide(){
     if(p2.name===myName)return;
     const act=gs.phase==='init'?i===gs.initIdx:i===gs.curIdx;
     const d=document.createElement('div');d.className='opcard';
-    d.innerHTML=`<div class="opname" style="color:${p2.color};">${p2.name}${act?' ⭐':''}</div>
-      <div class="opinfo">🪙 ${p2.coins} | 🏛️ ${p2.lmCount||0}/3</div>`;
+    // Build their establishments list
+    const opOwned=p2.ests||{};
+    let estHtml='';
+    Object.keys(opOwned).forEach(eid=>{
+      const cnt=opOwned[eid];if(!cnt)return;
+      const e=getE(eid);if(!e)return;
+      const cl={blue:'blue',green:'green',red:'red',purple:'purple'}[e.type]||'blue';
+      let incStr=getIncomeStr(eid);
+      estHtml+='<div class="mpill '+cl+'" style="display:flex;flex-direction:column;gap:1px;min-width:80px;margin:.2rem .2rem 0 0;">'
+        +'<span style="font-weight:800;font-size:.75rem;">'+getTypeIcon(e.type)+' '+e.name+(cnt>1?' ×'+cnt:'')+'</span>'
+        +'<span style="font-size:.65rem;opacity:.85;">🎲['+e.roll.join(',')+'] '+incStr+'</span>'
+        +'</div>';
+    });
+    d.innerHTML='<div class="opname" style="color:'+p2.color+';">'+p2.name+(act?' ⭐':'')+'</div>'
+      +'<div class="opinfo">🪙 '+p2.coins+' | 🏛️ '+(p2.lmCount||0)+'/3</div>'
+      +(estHtml?'<div style="display:flex;flex-wrap:wrap;margin-top:.4rem;">'+estHtml+'</div>':'<div style="font-size:.75rem;color:var(--mid);margin-top:.3rem;">No establishments yet</div>');
     op.appendChild(d);
   });
 }
