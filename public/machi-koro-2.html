@@ -91,7 +91,7 @@ select option{background:#fff;}
 .abtn.red{background:var(--red);box-shadow:0 4px 0 var(--red-dark);}
 
 /* MARKET */
-.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:.75rem;margin-bottom:1.1rem;}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.75rem;margin-bottom:1.1rem;}
 .ecard{border-radius:14px;padding:1rem;cursor:pointer;border:3px solid transparent;transition:transform .15s,box-shadow .15s;position:relative;min-height:160px;display:flex;flex-direction:column;box-shadow:0 3px 10px rgba(0,0,0,.1);}
 .ecard:hover.buyable{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.2);}
 .ecard.buyable{border-color:var(--sun)!important;cursor:pointer;}
@@ -103,7 +103,7 @@ select option{background:#fff;}
 .ec-purple{background:#ecdcff;border-color:#c090f0;}
 .croll{font-size:.88rem;color:var(--mid);font-weight:800;}
 .cname{font-size:.98rem;font-weight:800;color:var(--txt);flex:1;margin:5px 0;line-height:1.35;}
-.ceff{font-size:.82rem;color:var(--mid);line-height:1.4;}
+.ceff{font-size:.82rem;color:var(--mid);line-height:1.4;font-weight:700;}
 .ccost{font-size:1.05rem;font-weight:800;color:var(--sky-dark);margin-top:auto;}
 .ccount{position:absolute;top:5px;right:7px;font-size:.72rem;background:var(--sky);color:#fff;border-radius:10px;padding:1px 7px;font-weight:800;}
 .tdot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:4px;vertical-align:middle;}
@@ -116,8 +116,8 @@ select option{background:#fff;}
 .lcard.buildable{border-color:var(--green)!important;}
 .lcard:hover.buildable{transform:translateY(-3px);}
 .lname{font-size:.95rem;font-weight:800;color:var(--txt);}
-.lcosts{font-size:.8rem;color:var(--sky);font-weight:700;margin:.3rem 0;}
-.leff{font-size:.74rem;color:var(--mid);line-height:1.3;}
+.lcosts{font-size:.8rem;color:var(--sky);font-weight:800;margin:.3rem 0;}
+.leff{font-size:.74rem;color:var(--mid);line-height:1.3;font-weight:700;}
 .lstatus{font-size:.8rem;margin-top:.4rem;font-weight:800;}
 .lcard.built .lstatus{color:var(--green);}
 .lcard:not(.built) .lstatus{color:var(--mid);}
@@ -766,7 +766,7 @@ function renderMarket(){
       +'<div class="cname"><span class="tdot '+dc+'"></span>'+e.name+'</div>'
       +'<div class="ceff">'+e.eff+'</div>'
       +'<div class="ccost">🪙 '+e.cost+'</div>'
-      +'<div style="font-size:.6rem;font-weight:700;margin-top:3px;opacity:.75;">'+typeLabel+'</div>';
+      +'<div style="font-size:.65rem;font-weight:800;margin-top:3px;opacity:.8;">'+typeLabel+'</div>';
     if(canBuy)div.onclick=(function(id){return function(){initMode?buyInit(id):buyEst(id);};})(eid);
     return div;
   }
@@ -837,7 +837,9 @@ function getIncomeStr(eid){
   else if(eid==='furniture')return '🪙+4 per ⚙️(gear) card';
   else if(eid==='winery')return '🪙+3 per 🍇(vine) card';
   else if(eid==='food_wh')return '🪙+2 per ☕(cup) card';
-  return inc?'🪙+'+inc+' (any turn)':'';
+  // Blue cards activate on anyone's turn, green on your turn only
+  var turnStr = (e && e.type === 'green') ? '(your turn)' : '(any turn)';
+  return inc ? '🪙+' + inc + ' ' + turnStr : '';
 }
 
 function getTypeIcon(type){
@@ -956,6 +958,7 @@ async function rollDice(nd){
   gs.lastDice=dice;gs.lastTotal=total;
 
   setTimeout(async()=>{
+    const _coinsBefore=myP().coins;
     const entries=applyIncome(total,dice,doubles);
     entries.forEach(e=>gs.log.push(e));
 
