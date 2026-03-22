@@ -350,7 +350,6 @@ function connectSocket(code){
         if(msg.state.gameState&&document.getElementById('game').style.display!=='none'){
           const serverAction=msg.state.gameState.lastAction||0;
           const localAction=gs?gs.lastAction:0;
-          console.log('onmessage: serverAction=',serverAction,'localAction=',localAction,'phase=',msg.state.gameState.phase,'initIdx=',msg.state.gameState.initIdx);
           if(serverAction>localAction){
             gs=msg.state.gameState;
             if(window._roomMeta)window._roomMeta=Object.assign({},msg.state,{gameState:gs});
@@ -530,8 +529,8 @@ function enterGame(room){
 }
 async function push(){
   gs.lastAction=Date.now();
-  // Store the last known room metadata so push() doesn't need to call loadRoom
-  // (calling loadRoom triggers onmessage which overwrites gs mid-save)
+  // _buying is a local-only flag — never persist it to the server
+  delete gs._buying;
   if(!window._roomMeta) window._roomMeta={};
   window._roomMeta.gameState=gs;
   window._roomMeta.lastUpdate=Date.now();
@@ -594,7 +593,6 @@ function showDice(dice,anim){
 function renderMarket(){
   const grid=document.getElementById('mgrid');grid.innerHTML='';
   const player=myP();
-  console.log('renderMarket: phase=',gs.phase,'isMyTurn=',isMyTurn(),'myName=',myName,'initIdx=',gs.initIdx,'myIdx=',myIdx(),'_buying=',gs._buying);
   const vis=[...(gs.market.vis.low||[]),...(gs.market.vis.high||[])];
   vis.forEach(eid=>{
     const e=getE(eid);if(!e)return;
