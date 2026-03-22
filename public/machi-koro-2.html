@@ -656,7 +656,7 @@ function renderMarket(){
     const dc={blue:'td-blue',green:'td-green',red:'td-red',purple:'td-purple'}[e.type]||'td-blue';
     const div=document.createElement('div');
     div.className='ecard '+cc+(canBuy?' buyable':'')+(cantAff?' cantaff':'')+((!initMode&&!buyMode)?' notturn':'');
-    var typeLabels={blue:'🔵 Anyone's roll',green:'🟢 Your roll only',red:'🔴 Others' roll',purple:'🟣 Your roll only'};
+    var typeLabels={blue:'🔵 Anyone\'s roll',green:'🟢 Your roll only',red:'🔴 Others\' roll',purple:'🟣 Your roll only'};
     var typeLabel=typeLabels[e.type]||'';
     div.innerHTML='<div class="croll">'+e.icon+' ['+e.roll.join(',')+']</div>'
       +'<div class="cname"><span class="tdot '+dc+'"></span>'+e.name+'</div>'
