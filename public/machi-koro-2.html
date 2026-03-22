@@ -533,31 +533,33 @@ let socket = null;
 let pendingResolvers = {};
 
 function connectSocket(code) {
-  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  socket = new WebSocket(`${proto}://${location.host}`);
+  return new Promise((resolve) => {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    socket = new WebSocket(`${proto}://${location.host}`);
 
-  socket.onopen = () => {
-    socket.send(JSON.stringify({ type: 'join', code }));
-  };
+    socket.onopen = () => {
+      socket.send(JSON.stringify({ type: 'join', code }));
+      resolve();
+    };
 
-  socket.onmessage = (event) => {
-    const msg = JSON.parse(event.data);
-    if (msg.type === 'state' && msg.state) {
-      // Resolve any pending loadRoom calls
-      Object.values(pendingResolvers).forEach(resolve => resolve(msg.state));
-      pendingResolvers = {};
-
-      // Also update game state live if in-game
-      if (msg.state.gameState && document.getElementById('game').style.display !== 'none') {
-        gameState = msg.state.gameState;
-        renderGame();
+    socket.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      if (msg.type === 'state' && msg.state) {
+        Object.values(pendingResolvers).forEach(resolve => resolve(msg.state));
+        pendingResolvers = {};
+        if (msg.state.gameState && document.getElementById('game').style.display !== 'none') {
+          gameState = msg.state.gameState;
+          renderGame();
+        }
       }
-    }
-  };
+    };
+
+    socket.onerror = () => resolve();
+  });
 }
 
 async function saveRoom(code, data) {
-  if (!socket || socket.readyState !== 1) connectSocket(code);
+  if (!socket || socket.readyState !== 1) await connectSocket(code);
   socket.send(JSON.stringify({ type: 'update', state: data }));
 }
 
@@ -610,7 +612,7 @@ async function hostGame() {
   myName = name;
   isHost = true;
   roomCode = genCode();
-  connectSocket(roomCode);
+  await connectSocket(roomCode);
   const room = {
     code: roomCode,
     status: 'waiting',
@@ -634,7 +636,7 @@ async function joinGame() {
   if (room.players.length >= room.numPlayers) return showErr('join-err','Room is full');
   if (room.players.find(p => p.name === name)) return showErr('join-err','Name taken');
   myName = name; isHost = false; roomCode = code;
-  connectSocket(roomCode);
+  await connectSocket(roomCode);
   room.players.push({ name, coins: 3, establishments: initEstablishments(), landmarks: initLandmarks(), isHost: false });
   room.lastUpdate = Date.now();
   await saveRoom(code, room);
