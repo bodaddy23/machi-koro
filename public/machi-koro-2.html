@@ -232,8 +232,10 @@ select option{background:#fff;}
       </div>
       <div class="stitle">🏪 Market</div>
       <div id="mgrid" class="mgrid"></div>
-      <div class="stitle">🏛️ Landmarks — Build 3 to Win!</div>
-      <div id="mlm" class="lgrid"></div>
+      <div id="lm-section">
+        <div class="stitle">🏛️ Landmarks — Build 3 to Win!</div>
+        <div id="mlm" class="lgrid"></div>
+      </div>
     </div>
     <div class="side">
       <div>
@@ -429,8 +431,8 @@ function buildMarket(deck){
 function buildLmPool(){
   const ids=LANDMARKS.map(l=>l.id).filter(id=>id!=='loan_office');
   for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}
-  // pick 8 random + loan office
-  const pool=ids.slice(0,8);
+  // pick 4 random + loan office = 5 total
+  const pool=ids.slice(0,4);
   pool.push('loan_office');
   return pool;
 }
@@ -526,6 +528,12 @@ async function push(){
 function render(){
   if(!gs)return;
   if(gs.winner){showWinner(gs.winner);return;}
+  // Reset boughtThisTurn when it becomes our turn (prevents stale state from poll)
+  if(isMyTurn()&&gs.phase==='roll'){boughtThisTurn=false;}
+  if(isMyTurn()&&gs.phase==='init'){
+    const key=gs.initIdx+'_'+gs.initRoundsLeft;
+    if(gs._myTurnKey!==key){boughtThisTurn=false;gs._myTurnKey=key;}
+  }
   renderTopBar();renderBanner();renderDice();renderMarket();renderLandmarks();renderSide();
 }
 
@@ -599,6 +607,9 @@ function renderMarket(){
 }
 
 function renderLandmarks(){
+  const lmSection=document.getElementById('lm-section');
+  if(gs.phase==='init'){lmSection.style.display='none';return;}
+  lmSection.style.display='block';
   const grid=document.getElementById('mlm');grid.innerHTML='';
   const player=myP();
   (gs.lmPool||[]).forEach(lid=>{
@@ -652,12 +663,15 @@ async function buyInit(eid){
   if(!isMyTurn()||gs.phase!=='init'||boughtThisTurn)return;
   const player=myP();const e=getE(eid);
   if(!e||player.coins<e.cost)return;
+  boughtThisTurn=true;
   player.coins-=e.cost;
   player.ests[eid]=(player.ests[eid]||0)+1;
-  removeFromMarket(eid);boughtThisTurn=true;
+  removeFromMarket(eid);
   gs.log.push({msg:`${myName} built ${e.name} (🪙${e.cost})`,cls:'log-you'});
   advanceInit();
-  await push();render();syncLog();
+  await push();
+  boughtThisTurn=false;
+  render();syncLog();
 }
 function advanceInit(){
   const n=gs.players.length;
