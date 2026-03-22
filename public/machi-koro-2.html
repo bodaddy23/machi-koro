@@ -230,10 +230,27 @@ select option{background:#fff;}
           <button class="abtn gr" onclick="endTurn()">End Turn ➡️</button>
         </div>
       </div>
-      <div class="stitle">🏪 Market</div>
-      <div id="mgrid" class="mgrid"></div>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.4rem;">
+        <div class="stitle" style="margin-bottom:0;">🏪 Market</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">
+        <span style="font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--sky-dark);">🎲 Rolls 1–6</span>
+        <span style="background:var(--sky);color:#fff;border-radius:8px;padding:2px 10px;font-size:.8rem;font-weight:800;" id="deck-low-count"></span>
+        <span style="font-size:.75rem;color:var(--mid);font-weight:700;">cards in deck</span>
+      </div>
+      <div id="mgrid-low" class="mgrid"></div>
+      <div style="display:flex;align-items:center;gap:.6rem;margin:.5rem 0;">
+        <span style="font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--sky-dark);">🎲 Rolls 7–12</span>
+        <span style="background:var(--purple);color:#fff;border-radius:8px;padding:2px 10px;font-size:.8rem;font-weight:800;" id="deck-high-count"></span>
+        <span style="font-size:.75rem;color:var(--mid);font-weight:700;">cards in deck</span>
+      </div>
+      <div id="mgrid-high" class="mgrid"></div>
       <div id="lm-section">
-        <div class="stitle">🏛️ Landmarks — Build 3 to Win!</div>
+        <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.5rem;">
+          <div class="stitle" style="margin-bottom:0;">🏛️ Landmarks — Build 3 to Win!</div>
+          <span style="background:var(--sun);color:var(--txt);border-radius:8px;padding:2px 10px;font-size:.8rem;font-weight:800;" id="deck-lm-count"></span>
+          <span style="font-size:.75rem;color:var(--mid);font-weight:700;" id="deck-lm-label"></span>
+        </div>
         <div id="mlm" class="lgrid"></div>
       </div>
     </div>
@@ -439,8 +456,8 @@ function buildMarket(deck){
 function buildLmPool(){
   const ids=LANDMARKS.map(l=>l.id).filter(id=>id!=='loan_office');
   for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}
-  // pick 4 random + loan office = 5 total
-  const pool=ids.slice(0,4);
+  // pick 5 random + loan office = 6 total (loan office shown conditionally)
+  const pool=ids.slice(0,5);
   pool.push('loan_office');
   return pool;
 }
@@ -652,7 +669,38 @@ function renderSide(){
     const cnt=owned[eid];if(!cnt)return;
     const e=getE(eid);if(!e)return;
     const cl={blue:'blue',green:'green',red:'red',purple:'purple'}[e.type]||'blue';
-    const sp=document.createElement('span');sp.className=`mpill ${cl}`;sp.textContent=`${e.name} ×${cnt}`;
+    // Work out the base coin income for display
+    let incomeStr='';
+    if(e.type==='red'){
+      const amt=eid==='sushi_bar'?3:2;
+      incomeStr=`-${amt} opp`;
+    } else if(e.type==='purple'){
+      if(eid==='stadium')incomeStr='+3/opp';
+      else if(eid==='biz_center')incomeStr='swap';
+      else if(eid==='shop_dist')incomeStr='½ opp';
+    } else {
+      let inc=0;
+      if(eid==='wheat_field')inc=1;
+      else if(eid==='vineyard')inc=2;
+      else if(eid==='flower_gdn')inc=2;
+      else if(eid==='forest')inc=2;
+      else if(eid==='corn_field')inc=3;
+      else if(eid==='apple_orch')inc=3;
+      else if(eid==='mine')inc=6;
+      else if(eid==='bakery')inc=2;
+      else if(eid==='convenience')inc=3;
+      else if(eid==='flower_shop')inc='3/🌸';
+      else if(eid==='furniture')inc='4/⚙️';
+      else if(eid==='winery')inc='3/🍇';
+      else if(eid==='food_wh')inc='2/☕';
+      if(inc)incomeStr=`+${inc}`;
+    }
+    const rollStr=`[${e.roll.join(',')}]`;
+    const sp=document.createElement('div');
+    sp.className=`mpill ${cl}`;
+    sp.style.cssText='display:flex;flex-direction:column;gap:1px;min-width:90px;';
+    sp.innerHTML=`<span style="font-weight:800;">${e.name}${cnt>1?' ×'+cnt:''}</span>
+      <span style="font-size:.7rem;opacity:.85;">${rollStr} ${incomeStr}</span>`;
     grid.appendChild(sp);
   });
   const op=document.getElementById('oplayers');op.innerHTML='';
