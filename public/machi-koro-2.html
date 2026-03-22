@@ -528,12 +528,6 @@ async function push(){
 function render(){
   if(!gs)return;
   if(gs.winner){showWinner(gs.winner);return;}
-  // Reset boughtThisTurn when it becomes our turn (prevents stale state from poll)
-  if(isMyTurn()&&gs.phase==='roll'){boughtThisTurn=false;}
-  if(isMyTurn()&&gs.phase==='init'){
-    const key=gs.initIdx+'_'+gs.initRoundsLeft;
-    if(gs._myTurnKey!==key){boughtThisTurn=false;gs._myTurnKey=key;}
-  }
   renderTopBar();renderBanner();renderDice();renderMarket();renderLandmarks();renderSide();
 }
 
@@ -588,7 +582,7 @@ function renderMarket(){
   const vis=[...(gs.market.vis.low||[]),...(gs.market.vis.high||[])];
   vis.forEach(eid=>{
     const e=getE(eid);if(!e)return;
-    const initMode=gs.phase==='init'&&isMyTurn()&&!boughtThisTurn;
+    const initMode=gs.phase==='init'&&isMyTurn()&&!gs._buying;
     const buyMode=isMyTurn()&&gs.phase==='buy'&&!boughtThisTurn;
     const canBuy=(initMode||buyMode)&&player.coins>=e.cost;
     const cantAff=(initMode||buyMode)&&player.coins<e.cost;
@@ -660,17 +654,17 @@ function renderSide(){
 
 // ── INITIAL BUILD ──
 async function buyInit(eid){
-  if(!isMyTurn()||gs.phase!=='init'||boughtThisTurn)return;
+  if(!isMyTurn()||gs.phase!=='init'||gs._buying)return;
   const player=myP();const e=getE(eid);
   if(!e||player.coins<e.cost)return;
-  boughtThisTurn=true;
+  gs._buying=true;
   player.coins-=e.cost;
   player.ests[eid]=(player.ests[eid]||0)+1;
   removeFromMarket(eid);
   gs.log.push({msg:`${myName} built ${e.name} (🪙${e.cost})`,cls:'log-you'});
   advanceInit();
   await push();
-  boughtThisTurn=false;
+  gs._buying=false;
   render();syncLog();
 }
 function advanceInit(){
