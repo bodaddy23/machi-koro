@@ -66,7 +66,7 @@ select option{background:#fff;}
 .pchip.active{background:var(--sun);color:var(--txt);border-color:var(--sun-dark);transform:scale(1.06);}
 .tlbl{color:var(--sun);font-weight:800;font-size:1rem;flex-shrink:0;}
 
-.gbody{display:grid;grid-template-columns:1fr 330px;flex:1;min-height:0;}
+.gbody{display:grid;grid-template-columns:1fr 420px;flex:1;min-height:0;}
 @media(max-width:820px){.gbody{grid-template-columns:1fr;}.side{border-left:none!important;border-top:3px solid var(--panel-b);}}
 .main{padding:1.1rem;overflow-y:auto;}
 .side{background:#fff;border-left:3px solid var(--panel-b);padding:1.1rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem;}
@@ -204,7 +204,7 @@ select option{background:#fff;}
 .pchip.active{background:var(--sun);color:var(--txt);border-color:var(--sun-dark);transform:scale(1.06);}
 .tlbl{color:var(--sun);font-weight:800;font-size:1rem;flex-shrink:0;}
 
-.gbody{display:grid;grid-template-columns:1fr 330px;flex:1;min-height:0;}
+.gbody{display:grid;grid-template-columns:1fr 420px;flex:1;min-height:0;}
 @media(max-width:820px){.gbody{grid-template-columns:1fr;}.side{border-left:none!important;border-top:3px solid var(--panel-b);}}
 .main{padding:1.1rem;overflow-y:auto;}
 .side{background:#fff;border-left:3px solid var(--panel-b);padding:1.1rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem;}
@@ -525,15 +525,15 @@ select option{background:#fff;}
           <div class="stitle">🏠 My City</div>
           <div class="my-coins-lbl" id="mcoins"></div>
           <!-- Establishment cards -->
-          <!-- Icon bubbles below cards -->
-          <div style="font-size:.7rem;font-weight:800;color:var(--mid);margin:.4rem 0 .2rem;">Icons:</div>
+          <div id="mests" class="mypills" style="margin-bottom:.4rem;"></div>
+          <!-- Icon bubbles -->
+          <div style="font-size:.7rem;font-weight:800;color:var(--mid);margin:.3rem 0 .2rem;">Icons:</div>
           <div id="my-icon-pills" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.4rem;"></div>
-          <div style="margin-top:.5rem;">
-            <div style="font-size:.75rem;font-weight:800;color:var(--sun-dark);margin-bottom:.3rem;">🏛️ Built Landmarks</div>
+          <!-- Built Landmarks at bottom -->
+          <div style="margin-top:.4rem;border-top:1.5px solid var(--panel-b);padding-top:.4rem;">
+            <div style="font-size:.72rem;font-weight:800;color:var(--sun-dark);margin-bottom:.3rem;">🏛️ Built Landmarks</div>
             <div id="my-landmarks-built" class="mypills"></div>
           </div>
-          <!-- Establishment cards -->
-          <div id="mests" class="mypills" style="margin-bottom:.4rem;"></div>
         </div>
         <div>
           <div class="stitle">👥 Others</div>
@@ -1604,10 +1604,15 @@ function renderSide(){
         +'<span style="font-size:.65rem;font-weight:600;color:var(--mid);line-height:1.35;">'+lm.eff+'</span>'
         +'</div>';
     });
+    const lmSection=(p2.landmarks&&p2.landmarks.length)
+      ?'<div style="margin-top:.4rem;border-top:1.5px solid var(--panel-b);padding-top:.4rem;">'
+        +'<div style="font-size:.68rem;font-weight:800;color:var(--sun-dark);margin-bottom:3px;">🏛️ Built Landmarks</div>'
+        +lmHtml+'</div>'
+      :'';
     d.innerHTML='<div class="opname" style="color:'+p2.color+';">'+p2.name+(act?' ⭐':'')+'</div>'
       +'<div class="opinfo">🪙 '+p2.coins+' | 🏛️ '+(p2.lmCount||0)+'/3</div>'
-      +(lmHtml?'<div style="display:flex;flex-wrap:wrap;margin-top:.3rem;">'+lmHtml+'</div>':'')
-      +(estHtml?'<div style="display:flex;flex-wrap:wrap;margin-top:.4rem;">'+estHtml+'</div>':'<div style="font-size:.75rem;color:var(--mid);margin-top:.3rem;">No establishments yet</div>');
+      +estHtml
+      +lmSection;
     op.appendChild(d);
   });
 }
