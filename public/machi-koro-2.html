@@ -4,11 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Machi Koro 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* Self-contained font stack - no external dependencies */
   :root {
-    --font-display: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
-    --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-display: 'Fredoka One', 'Trebuchet MS', cursive;
+    --font-body: 'Nunito', 'Segoe UI', sans-serif;
   }
 </style>
 <style>
@@ -1149,8 +1151,13 @@ async function buyInit(eid){
 }
 function advanceInit(){
   const n=gs.players.length;
+  // Track turns taken with a counter rather than watching for idx===0
+  // (initIdx can start at any player so the wrap-to-0 check skips players)
+  if(!gs.initTurnsTaken) gs.initTurnsTaken=0;
+  gs.initTurnsTaken++;
   gs.initIdx=(gs.initIdx+1)%n;
-  if(gs.initIdx===0){
+  // End of round = every player has taken a turn
+  if(gs.initTurnsTaken%n===0){
     gs.initRoundsLeft--;
     if(gs.initRoundsLeft<=0){
       gs.phase='roll';gs.curIdx=gs.initIdx;
@@ -1616,8 +1623,8 @@ function playDefeatSound(){
       o.connect(g);g.connect(ctx.destination);
       o.type='sine';o.frequency.value=f;
       g.gain.setValueAtTime(0,now+t);
-      g.gain.linearRampToValueAtTime(0.10,now+t+0.6);
-      g.gain.setValueAtTime(0.10,now+2.5);
+      g.gain.linearRampToValueAtTime(0.0562,now+t+0.6);
+      g.gain.setValueAtTime(0.0562,now+2.5);
       g.gain.exponentialRampToValueAtTime(0.001,now+4.0);
       o.start(now+t);o.stop(now+4.1);
     });
@@ -1627,7 +1634,7 @@ function playDefeatSound(){
     rumble.type='sawtooth';rumble.frequency.value=40;
     rumble.frequency.exponentialRampToValueAtTime(28,now+4.0);
     rg.gain.setValueAtTime(0,now+2.0);
-    rg.gain.linearRampToValueAtTime(0.14,now+2.5);
+    rg.gain.linearRampToValueAtTime(0.0788,now+2.5);
     rg.gain.exponentialRampToValueAtTime(0.001,now+4.2);
     rumble.start(now+2.0);rumble.stop(now+4.3);
   }catch(e){}
