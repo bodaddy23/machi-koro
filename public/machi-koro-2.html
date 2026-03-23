@@ -761,7 +761,7 @@ function gc(){return Math.random().toString(36).substring(2,6).toUpperCase();}
 function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';setTimeout(()=>e.style.display='none',4000);}
 function showModal(title,body,btns=[{lbl:'OK',fn:closeModal}]){
   document.getElementById('mtitle').textContent=title;
-  document.getElementById('mbody').textContent=body;
+  document.getElementById('mbody').innerHTML=body;
   const bc=document.getElementById('mbtns');bc.innerHTML='';
   btns.forEach(b=>{const btn=document.createElement('button');btn.className='btn btn-sky';btn.textContent=b.lbl;btn.onclick=b.fn;bc.appendChild(btn);});
   document.getElementById('modalbg').classList.add('show');
