@@ -1256,20 +1256,12 @@ function renderLandmarks(){
   const grid=document.getElementById('mlm');grid.innerHTML='';
   const player=myP();
   // Only show landmarks NOT yet built by this player
-  // Build the visible list: 5 from pool + loan_office appended separately
-  const _visBase=(gs.lmPool&&gs.lmPool.vis)||gs.lmPool||[];
-  const _visLms=_visBase.filter(id=>id!=='loan_office');
-  // Always append loan_office so it can show conditionally without stealing a slot
-  if(!_visLms.includes('loan_office'))_visLms.push('loan_office');
+  const _visLms=(gs.lmPool&&gs.lmPool.vis)||gs.lmPool||[];
   _visLms.forEach(lid=>{
     const lm=getL(lid);if(!lm)return;
     if(hasLm(player,lid))return; // already built — shown in My City instead
     const cost=lmCost(player,lid);
-    // Loan office special condition
-    if(lid==='loan_office'){
-      const noLmCount=gs.players.filter(p=>!p.lmCount||p.lmCount===0).length;
-      if(noLmCount!==1||player.lmCount>0)return;
-    }
+
     const canBuild=isMyTurn()&&gs.phase==='buy'&&!boughtThisTurn&&player.coins>=cost;
     const div=document.createElement('div');
     div.className='lm-card'+(canBuild?' buildable':'');
@@ -1972,20 +1964,9 @@ async function buildLm(lid){
 
   // Refill visible landmarks from supply
   if(gs.lmPool&&gs.lmPool.supply&&gs.lmPool.supply.length>0){
-    // Keep drawing until we find a non-loan_office landmark for the visible slot
-    let next=null;
-    const temp=[];
-    while(gs.lmPool.supply.length>0){
-      const candidate=gs.lmPool.supply.shift();
-      if(candidate==='loan_office'){temp.push(candidate);}
-      else{next=candidate;break;}
-    }
-    // Put skipped loan_office cards back at end of supply
-    temp.forEach(c=>gs.lmPool.supply.push(c));
-    if(next){
-      gs.lmPool.vis.push(next);
-      gs.log.push({msg:`New landmark available: ${getL(next).name}!`,cls:'log-sys'});
-    }
+    const next=gs.lmPool.supply.shift();
+    gs.lmPool.vis.push(next);
+    gs.log.push({msg:`New landmark available: ${getL(next).name}!`,cls:'log-sys'});
   }
 
   // Immediate landmark effects
@@ -2031,7 +2012,15 @@ function applyImmediateLm(lid,player){
 
 // ── END TURN ──
 async function endTurn(){
-  if(!isMyTurn()||gs.phase!=='buy')return;
+  if(!isMyTurn())return;
+  // Allow ending turn during init phase (buying is optional)
+  if(gs.phase==='init'){
+    gs.log.push({msg:`${myName} skipped buying.`,cls:'log-sys'});
+    advanceInit();
+    await push();render();syncLog();
+    return;
+  }
+  if(gs.phase!=='buy')return;
   const player=myP();
   // Airport: no build = +5
   if(!boughtThisTurn&&hasLm(player,'airport')){
