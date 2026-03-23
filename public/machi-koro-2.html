@@ -112,6 +112,10 @@ select option{background:#fff;}
 /* MARKET */
 .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:.75rem;margin-bottom:1.1rem;}
 .ecard{border-radius:14px;cursor:pointer;border:3px solid transparent;transition:transform .15s,box-shadow .15s;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(0,0,0,.15);}
+.ec-type-blue{border-color:#2a8de0;}
+.ec-type-green{border-color:#2eb872;}
+.ec-type-red{border-color:#e8423a;}
+.ec-type-purple{border-color:#8b3fbf;}
 .ecard:hover.buyable{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.22);}
 .ecard.buyable{border-color:var(--sun)!important;cursor:pointer;}
 .ecard.cantaff{opacity:.55;cursor:not-allowed;}
@@ -246,6 +250,10 @@ select option{background:#fff;}
 /* MARKET */
 .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:.75rem;margin-bottom:1.1rem;}
 .ecard{border-radius:14px;cursor:pointer;border:3px solid transparent;transition:transform .15s,box-shadow .15s;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(0,0,0,.15);}
+.ec-type-blue{border-color:#2a8de0;}
+.ec-type-green{border-color:#2eb872;}
+.ec-type-red{border-color:#e8423a;}
+.ec-type-purple{border-color:#8b3fbf;}
 .ecard:hover.buyable{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.22);}
 .ecard.buyable{border-color:var(--sun)!important;cursor:pointer;}
 .ecard.cantaff{opacity:.55;cursor:not-allowed;}
@@ -1138,7 +1146,7 @@ function renderMarket(){
     const tagLabels={blue:'Anyones 🎲',green:'Your 🎲',red:'Others 🎲',purple:'Your 🎲'};
     const tag=tagLabels[e.type]||'';
     const div=document.createElement('div');
-    div.className='ecard'+(canBuy?' buyable':'')+(cantAff?' cantaff':'')+((!initMode&&!buyMode)?' notturn':'');
+    div.className='ecard ec-type-'+e.type+(canBuy?' buyable':'')+(cantAff?' cantaff':'')+((!initMode&&!buyMode)?' notturn':'');
     var stackBadge=stackCount>1?'<div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);color:#fff;font-size:.68rem;font-weight:900;border-radius:6px;padding:2px 7px;">×'+stackCount+'</div>':'';
     div.style.position='relative';
     div.innerHTML='<div class="ec-banner '+bannerClass+'">'
