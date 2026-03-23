@@ -1155,7 +1155,7 @@ function renderDice(){
     if(_eb)_eb.disabled=true;
     if(gs.lastDice){
       const diceKey=gs.lastDice.join(',')+gs.lastTotal;
-      if(window._lastRenderedDice!==diceKey){window._lastRenderedDice=diceKey;playDiceRollSound();showDice(gs.lastDice,true);}
+      if(window._lastRenderedDice!==diceKey){window._lastRenderedDice=diceKey;showDice(gs.lastDice,true);}
       else showDice(gs.lastDice,false);
     }
     return;
@@ -1169,6 +1169,7 @@ function showDice(dice,anim){
   const d1=document.getElementById('die1'),d2=document.getElementById('die2');
   if(anim){
     // Shake + flicker numbers, then land
+    playDiceRollSound();
     d1.className='die rolling'; d1.textContent='?';
     if(dice.length>1){d2.className='die rolling';d2.textContent='?';}
     else{d2.className='die empty';d2.textContent='?';}
@@ -1765,7 +1766,6 @@ async function rollDice(nd){
   if(!isMyTurn()||gs.phase!=='roll')return;
   document.getElementById('b1die').disabled=true;
   document.getElementById('b2dice').disabled=true;
-  playDiceRollSound();
   const dice=Array.from({length:nd},()=>Math.floor(Math.random()*6)+1);
   const total=dice.reduce((a,b)=>a+b,0);
   const doubles=nd===2&&dice[0]===dice[1];
