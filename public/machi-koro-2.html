@@ -271,9 +271,9 @@ select option{background:#fff;}
 
 /* LANDMARKS */
 .lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:.75rem;margin-bottom:1.1rem;}
-.lcard{border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(0,0,0,.15);border:3px solid transparent;transition:transform .15s,box-shadow .15s;cursor:default;background:linear-gradient(135deg,#7a5800,#c89010);}
-.lcard.buildable{border-color:var(--sun);cursor:pointer;}
-.lcard.buildable:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.22);}
+.lm-card{border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(0,0,0,.15);border:3px solid transparent;transition:transform .15s,box-shadow .15s;cursor:default;background:linear-gradient(135deg,#7a5800,#c89010);}
+.lm-card.buildable{border-color:var(--sun);cursor:pointer;}
+.lm-card.buildable:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.22);}
 .lm-banner{background:linear-gradient(135deg,#7a5800,#c89010);padding:9px 10px 8px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;margin:0;}
 .lm-banner.lm-launchpad{background:linear-gradient(135deg,#a82820,#e8423a);}
 .lm-top-row{display:flex;align-items:center;justify-content:space-between;}
@@ -1189,7 +1189,7 @@ function renderLandmarks(){
     }
     const canBuild=isMyTurn()&&gs.phase==='buy'&&!boughtThisTurn&&player.coins>=cost;
     const div=document.createElement('div');
-    div.className='lcard'+(canBuild?' buildable':'');
+    div.className='lm-card'+(canBuild?' buildable':'');
     const isLaunchPad=lid==='launch_pad';
     const isBuilderEffect=lm.scope==='builder';
     const scopeTag=isBuilderEffect?'Builder Effect':'All 🎲';
