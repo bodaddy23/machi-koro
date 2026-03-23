@@ -468,7 +468,8 @@ select option{background:#fff;}
   <div class="gbody">
     <div class="main">
       <div id="pbanner" class="pbanner" style="display:none"></div>
-      <div class="dpanel">
+      <div style="display:flex;gap:.8rem;align-items:flex-start;margin-bottom:0;flex-wrap:wrap;">
+      <div class="dpanel" style="margin-bottom:0;flex-shrink:0;">
         <div class="stitle">🎲 Dice</div>
         <div class="dice-row">
           <div class="die empty" id="die1">?</div>
@@ -484,6 +485,16 @@ select option{background:#fff;}
           <button class="abtn gr" onclick="endTurn()">End Turn ➡️</button>
         </div>
       </div>
+      <!-- Income per roll inline next to dice -->
+      <div class="infopanel" id="income-panel-main" style="flex:1;min-width:200px;margin-bottom:0;" style="margin-bottom:1.1rem;">
+        <div class="infopanel-hdr">
+          <span style="font-size:13px;">🎲</span>
+          <span class="infopanel-title">Income per roll</span>
+        </div>
+        <div class="infopanel-body" id="income-body-main"></div>
+      </div>
+      </div><!-- end dice+income flex -->
+      <div style="margin-bottom:1.1rem;"></div>
       <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.4rem;">
         <div class="stitle" style="margin-bottom:0;">🏪 Market</div>
       </div>
@@ -509,33 +520,29 @@ select option{background:#fff;}
       </div>
     </div>
     <div class="side">
-      <div>
-        <div class="stitle">🏠 My City</div>
-        <div class="my-coins-lbl" id="mcoins"></div>
-        <div id="mests" class="mypills"></div>
-        <div style="margin-top:.7rem;">
-          <div style="font-size:.8rem;font-weight:800;color:var(--sun-dark);margin-bottom:.3rem;">🏛️ Built Landmarks</div>
-          <div id="my-landmarks-built" class="mypills"></div>
+      <!-- My City + Other Players side by side -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+        <div>
+          <div class="stitle">🏠 My City</div>
+          <div class="my-coins-lbl" id="mcoins"></div>
+          <!-- Icon bubbles for my cards -->
+          <div id="my-icon-pills" style="display:flex;flex-wrap:wrap;gap:4px;margin:.3rem 0;"></div>
+          <div style="margin-top:.5rem;">
+            <div style="font-size:.75rem;font-weight:800;color:var(--sun-dark);margin-bottom:.3rem;">🏛️ Built Landmarks</div>
+            <div id="my-landmarks-built" class="mypills"></div>
+          </div>
+          <!-- Keep mests hidden but present for other logic -->
+          <div id="mests" style="display:none;"></div>
+        </div>
+        <div>
+          <div class="stitle">👥 Others</div>
+          <div id="oplayers"></div>
         </div>
       </div>
-      <div>
-        <div class="stitle">👥 Other Players</div>
-        <div id="oplayers"></div>
-      </div>
-      <div class="infopanel" id="cards-owned-panel">
-        <div class="infopanel-hdr">
-          <span style="font-size:13px;">🃏</span>
-          <span class="infopanel-title">Cards owned</span>
-        </div>
-        <div class="infopanel-body" id="cards-owned-body"></div>
-      </div>
-      <div class="infopanel" id="income-panel">
-        <div class="infopanel-hdr">
-          <span style="font-size:13px;">🎲</span>
-          <span class="infopanel-title">Income per roll</span>
-        </div>
-        <div class="infopanel-body" id="income-body"></div>
-      </div>
+      <!-- Cards owned panel removed — icons now inline above -->
+      <div id="cards-owned-panel" style="display:none;"><div id="cards-owned-body"></div></div>
+      <!-- Income panel stays in side but hidden — now shown in main next to dice -->
+      <div id="income-panel" style="display:none;"><div id="income-body"></div></div>
       <div class="logbox">
         <div class="stitle">📜 Game Log</div>
         <div class="logents" id="glog"></div>
@@ -1350,7 +1357,7 @@ function getTypeIcon(type){
 function renderInfoPanels(){
   if(!gs)return;
   const cardsBody=document.getElementById('cards-owned-body');
-  const incomeBody=document.getElementById('income-body');
+  const incomeBody=document.getElementById('income-body-main')||document.getElementById('income-body');
   if(!cardsBody||!incomeBody)return;
 
   // ── Panel 1: Cards owned (icon bubbles) ──
@@ -1498,9 +1505,32 @@ function renderSide(){
     });
     if(!(p.landmarks||[]).length) lmGrid.innerHTML='<span style="color:var(--mid);font-size:.8rem;">None yet</span>';
   }
+  // Render icon bubbles in My City
+  const iconPills=document.getElementById('my-icon-pills');
+  if(iconPills){
+    iconPills.innerHTML='';
+    const ownedIcons=p.ests||{};
+    if(!Object.keys(ownedIcons).length){
+      iconPills.innerHTML='<span style="font-size:.72rem;color:var(--mid);">None yet</span>';
+    } else {
+      Object.keys(ownedIcons).forEach(eid=>{
+        const cnt=ownedIcons[eid];if(!cnt)return;
+        const e=getE(eid);if(!e)return;
+        const cl=e.type;
+        const bubble=document.createElement('div');
+        bubble.className='ip-bubble '+cl;
+        const isNew=(p.lastBought===eid);
+        if(isNew)bubble.style.border='2.5px solid #f7c948';
+        bubble.textContent=e.icon;
+        if(cnt>1){const badge=document.createElement('span');badge.className='ip-cnt '+cl;badge.textContent=cnt;bubble.appendChild(badge);}
+        if(isNew){const star=document.createElement('span');star.className='ip-cnt '+cl;star.style.background='#f7c948';star.style.color='#7a5a00';star.textContent='★';star.style.top='-6px';star.style.left='-6px';star.style.right='auto';bubble.appendChild(star);}
+        iconPills.appendChild(bubble);
+      });
+    }
+  }
   const grid=document.getElementById('mests');grid.innerHTML='';
   const owned=p.ests||{};
-  if(!Object.keys(owned).length){grid.innerHTML='<span style="color:var(--mid);font-size:.85rem;">No establishments yet</span>';}
+  if(!Object.keys(owned).length){grid.innerHTML='';}
   else Object.keys(owned).forEach(eid=>{
     const cnt=owned[eid];if(!cnt)return;
     const e=getE(eid);if(!e)return;
@@ -1522,20 +1552,26 @@ function renderSide(){
     if(p2.name===myName)return;
     const act=gs.phase==='init'?i===gs.initIdx:i===gs.curIdx;
     const d=document.createElement('div');d.className='opcard';
-    // Build their establishments list
+    // Build icon bubbles for opponent
     const opOwned=p2.ests||{};
-    let estHtml='';
-    Object.keys(opOwned).forEach(eid=>{
-      const cnt=opOwned[eid];if(!cnt)return;
-      const e=getE(eid);if(!e)return;
-      const cl={blue:'blue',green:'green',red:'red',purple:'purple'}[e.type]||'blue';
-      let incStr=getIncomeStr(eid);
-      estHtml+='<div class="mpill '+cl+'" style="display:flex;flex-direction:column;gap:1px;min-width:80px;margin:.2rem .2rem 0 0;">'
-        +(p2.lastBought===eid?'<div style="font-size:.6rem;background:#f7c948;color:#7a5a00;border-radius:4px;padding:1px 5px;margin-bottom:1px;font-weight:900;">⭐ New</div>':'')
-        +'<span style="font-weight:800;font-size:.82rem;">'+e.icon+' '+e.name+(cnt>1?' ×'+cnt:'')+'</span>'
-        +'<span style="font-size:.68rem;opacity:.9;margin-top:1px;">🎲['+e.roll.join(',')+'] '+incStr+'</span>'
-        +'</div>';
-    });
+    let estHtml='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;">';
+    if(!Object.keys(opOwned).filter(k=>opOwned[k]>0).length){
+      estHtml+='<span style="font-size:.68rem;color:var(--mid);">None</span>';
+    } else {
+      Object.keys(opOwned).forEach(eid=>{
+        const cnt=opOwned[eid];if(!cnt)return;
+        const e=getE(eid);if(!e)return;
+        const cl=e.type;
+        const isNew=(p2.lastBought===eid);
+        let bStyle='position:relative;width:26px;height:26px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;';
+        const clr={blue:'background:#d6eeff;border:1.5px solid #80c0f8;',green:'background:#d4f5e0;border:1.5px solid #70d8a0;',red:'background:#ffe0de;border:1.5px solid #f09898;',purple:'background:#ecdcff;border:1.5px solid #c090f0;'}[cl]||'';
+        if(isNew)bStyle+='border:2.5px solid #f7c948;';
+        estHtml+='<div style="'+bStyle+clr+'">'+e.icon;
+        if(cnt>1)estHtml+='<span style="position:absolute;top:-5px;right:-5px;border-radius:8px;font-size:8px;font-weight:900;padding:1px 3px;color:#fff;background:'+({blue:'#1a6bbf',green:'#1a7a4a',red:'#a82820',purple:'#5c2280'}[cl]||'#333')+';">'+cnt+'</span>';
+        estHtml+='</div>';
+      });
+    }
+    estHtml+='</div>';
     // Built landmarks for this opponent
     let lmHtml='';
     (p2.landmarks||[]).forEach(lid=>{
