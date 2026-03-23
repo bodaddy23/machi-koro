@@ -134,26 +134,27 @@ select option{background:#fff;}
 
 /* LANDMARKS */
 .lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:.75rem;margin-bottom:1.1rem;}
-.lcard{border-radius:14px;cursor:pointer;border:3px solid transparent;transition:transform .15s,box-shadow .15s;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(0,0,0,.15);background:#fff;}
-.lcard.buildable{border-color:var(--sun)!important;}
-.lcard:hover.buildable{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.22);}
+.lcard{border-radius:14px;cursor:pointer;border:3px solid transparent;transition:transform .15s,box-shadow .15s;overflow:hidden;flex-direction:column;box-shadow:0 6px 18px rgba(0,0,0,.18);background:#fff;display:flex;}
+.lcard.buildable{border-color:#f7c948!important;cursor:pointer;}
+.lcard:hover.buildable{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.25);}
 .lcard:not(.buildable){cursor:default;}
-.lm-banner{background:linear-gradient(135deg,#8a6200,#f7c948);padding:10px 11px 10px;display:flex;flex-direction:column;gap:3px;min-height:72px;}
-.lm-banner.lm-launchpad{background:linear-gradient(135deg,#a82820,#e8423a);}
+.lm-banner{padding:10px 11px 9px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;}
+.lm-banner.lm-gold{background:linear-gradient(135deg,#7a5400,#f7c948);}
+.lm-banner.lm-launchpad{background:linear-gradient(135deg,#8a1010,#e8423a);}
 .lm-top-row{display:flex;align-items:center;justify-content:space-between;}
-.lm-badge{font-size:.65rem;font-weight:900;color:#fff;background:rgba(0,0,0,.3);border-radius:5px;padding:2px 7px;letter-spacing:.04em;}
-.lm-icon{font-size:1.6rem;line-height:1;}
-.lm-name{font-size:.95rem;font-weight:900;color:#fff;line-height:1.2;margin-top:4px;text-shadow:0 1px 3px rgba(0,0,0,.25);}
-.lm-body{padding:10px 11px 10px;flex:1;display:flex;flex-direction:column;background:#fff;border-top:none;}
-.lm-eff{font-size:.72rem;color:#333;line-height:1.4;font-weight:700;flex:1;margin-bottom:7px;}
-.lm-costs-row{display:flex;flex-direction:column;gap:3px;margin-bottom:7px;}
-.lm-cost-item{font-size:.68rem;font-weight:800;color:#8a6200;display:flex;justify-content:space-between;}
+.lm-badge{font-size:.6rem;font-weight:900;color:rgba(255,255,255,.95);background:rgba(0,0,0,.28);border-radius:4px;padding:2px 6px;letter-spacing:.06em;text-transform:uppercase;}
+.lm-icon{font-size:1.5rem;line-height:1;}
+.lm-name{font-size:.92rem;font-weight:900;color:#fff;line-height:1.25;margin-top:4px;text-shadow:0 1px 4px rgba(0,0,0,.3);}
+.lm-body{padding:9px 11px 10px;flex:1;display:flex;flex-direction:column;background:#ffffff;}
+.lm-eff{font-size:.71rem;color:#333;line-height:1.45;font-weight:700;flex:1;margin-bottom:8px;}
+.lm-costs-row{display:flex;flex-direction:column;gap:3px;margin-bottom:8px;}
+.lm-cost-item{font-size:.67rem;font-weight:800;color:#7a5400;display:flex;justify-content:space-between;}
 .lm-cost-item span:last-child{color:#1a6bbf;font-weight:900;}
-.lm-footer{display:flex;align-items:center;justify-content:space-between;padding-top:7px;border-top:1.5px solid #eee;}
-.lm-build{font-size:.82rem;font-weight:900;color:#1a6bbf;}
-.lm-scope{font-size:.65rem;font-weight:800;border-radius:5px;padding:2px 7px;}
-.lm-scope-all{background:#fff8e0;color:#8a6200;}
-.lm-scope-builder{background:#f5eeff;color:#5c2280;}
+.lm-footer{display:flex;align-items:center;justify-content:space-between;padding-top:7px;border-top:2px solid #f0e8cc;}
+.lm-build{font-size:.8rem;font-weight:900;color:#1a6bbf;}
+.lm-scope{font-size:.64rem;font-weight:800;border-radius:5px;padding:2px 7px;}
+.lm-scope-all{background:#fff8e0;color:#7a5400;}
+.lm-scope-builder{background:#f0e8ff;color:#5c2280;}
 
 /* MY CITY SIDE */
 .my-coins-lbl{font-size:.9rem;font-weight:800;color:var(--sky-dark);margin-bottom:.4rem;}
@@ -916,6 +917,11 @@ function showDice(dice,anim){
         const t=dice.reduce((a,b)=>a+b,0);
         document.getElementById('dtotal').textContent='Total: '+t;
         document.getElementById('dhint').textContent=(dice.length>1&&dice[0]===dice[1])?'🎉 Doubles!':'';
+        // Re-enable buttons
+        const _b1=document.getElementById('b1die');
+        const _b2=document.getElementById('b2dice');
+        if(_b1)_b1.disabled=false;
+        if(_b2)_b2.disabled=false;
       },300);
     },900);
   } else {
@@ -1009,7 +1015,7 @@ function renderLandmarks(){
       moving_co:'🚛',observatory:'🔭',shop_mall:'🛍️',soda_plant:'🥤',tech_startup:'💻',
       temple:'⛩️',exhibit_hall:'🏢',french_rest:'🍽️',loan_office:'🏦',museum:'🏛️',
       park:'🌳',publisher:'📰',radio_tower:'📡',tv_station:'📺',launch_pad:'🚀'}[lid]||'🏛️';
-    div.innerHTML='<div class="lm-banner'+(isLaunchPad?' lm-launchpad':'')+'">'
+    div.innerHTML='<div class="lm-banner '+(isLaunchPad?'lm-launchpad':'lm-gold')+'">'
       +'<div class="lm-top-row"><span class="lm-badge">LANDMARK</span><span class="lm-icon">'+icon+'</span></div>'
       +'<div class="lm-name">'+lm.name+'</div>'
       +'</div>'
