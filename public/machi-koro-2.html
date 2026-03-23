@@ -91,11 +91,11 @@ select option{background:#fff;}
 .abtn.gr{background:var(--green);box-shadow:0 4px 0 var(--green-dark);}
 .abtn.sun{background:var(--sun);color:var(--txt);box-shadow:0 4px 0 var(--sun-dark);}
 .abtn.red{background:var(--red);box-shadow:0 4px 0 var(--red-dark);}
-.abtn-blue{background:#cce4ff;color:#000;border:3px solid #1a6bbf;border-radius:10px;padding:.6rem 1.2rem;font-family:'Fredoka One',cursive;font-size:1rem;font-weight:800;cursor:pointer;transition:background .15s;}
+.abtn-blue{background:#cce4ff;color:#000;border:3px solid #1a6bbf;border-radius:10px;padding:.6rem 1.2rem;font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .15s;}
 .abtn-blue:hover{background:#b3d4ff;}
 .abtn-blue:active{transform:translateY(1px);}
 .abtn-blue:disabled{opacity:.4;cursor:default;transform:none;}
-.abtn-orange{background:#ffe0b2;color:#000;border:3px solid #f7a030;border-radius:10px;padding:.6rem 1.2rem;font-family:'Fredoka One',cursive;font-size:1rem;font-weight:800;cursor:pointer;transition:background .15s;}
+.abtn-orange{background:#ffe0b2;color:#000;border:3px solid #f7a030;border-radius:10px;padding:.6rem 1.2rem;font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .15s;}
 .abtn-orange:hover{background:#ffd090;}
 .abtn-orange:active{transform:translateY(1px);}
 .abtn-orange:disabled{opacity:.4;cursor:default;transform:none;}
@@ -127,7 +127,7 @@ select option{background:#fff;}
 .ec-tag-red{background:#fff0ef;color:#a82820;}.ec-tag-purple{background:#f5eeff;color:#5c2280;}
 
 /* LANDMARKS */
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:.75rem;margin-bottom:1.1rem;}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:.75rem;margin-bottom:1.1rem;}
 .lcard{border-radius:14px;cursor:pointer;border:3px solid transparent;transition:transform .15s,box-shadow .15s;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(0,0,0,.15);}
 .lcard.buildable{border-color:var(--sun)!important;}
 .lcard:hover.buildable{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.22);}
@@ -138,13 +138,13 @@ select option{background:#fff;}
 .lm-badge{font-size:.62rem;font-weight:900;color:rgba(255,255,255,.9);background:rgba(0,0,0,.2);border-radius:5px;padding:2px 6px;}
 .lm-icon{font-size:1.4rem;line-height:1;}
 .lm-name{font-size:.9rem;font-weight:900;color:#fff;line-height:1.2;margin-top:3px;}
-.lm-body{padding:8px 10px 9px;flex:1;display:flex;flex-direction:column;background:#fff;}
-.lm-eff{font-size:.67rem;color:#444;line-height:1.35;font-weight:700;flex:1;margin-bottom:6px;}
-.lm-costs-row{display:flex;flex-direction:column;gap:2px;margin-bottom:6px;}
-.lm-cost-item{font-size:.63rem;font-weight:800;color:#8a6200;display:flex;justify-content:space-between;}
+.lm-body{padding:10px 11px 10px;flex:1;display:flex;flex-direction:column;background:#fff;}
+.lm-eff{font-size:.72rem;color:#333;line-height:1.4;font-weight:700;flex:1;margin-bottom:7px;}
+.lm-costs-row{display:flex;flex-direction:column;gap:3px;margin-bottom:7px;}
+.lm-cost-item{font-size:.68rem;font-weight:800;color:#8a6200;display:flex;justify-content:space-between;}
 .lm-cost-item span:last-child{color:#1a6bbf;font-weight:900;}
-.lm-footer{display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1.5px solid #eee;}
-.lm-build{font-size:.8rem;font-weight:900;color:#1a6bbf;}
+.lm-footer{display:flex;align-items:center;justify-content:space-between;padding-top:7px;border-top:1.5px solid #eee;}
+.lm-build{font-size:.82rem;font-weight:900;color:#1a6bbf;}
 .lm-scope{font-size:.65rem;font-weight:800;border-radius:5px;padding:2px 7px;}
 .lm-scope-all{background:#fff8e0;color:#8a6200;}
 .lm-scope-builder{background:#f5eeff;color:#5c2280;}
@@ -566,21 +566,28 @@ function buildDeck(){
   return d;
 }
 function buildMarket(deck){
-  const low=[],high=[],lset=new Set(),hset=new Set();
+  // Split all copies into low/high buckets
   const ldeck=[],hdeck=[];
   deck.forEach(id=>{const e=getE(id);if(Math.max(...e.roll)<=6)ldeck.push(id);else hdeck.push(id);});
-  let li=0,hi=0;
-  while(lset.size<5&&li<ldeck.length){lset.add(ldeck[li++]);}
-  while(hset.size<5&&hi<hdeck.length){hset.add(hdeck[hi++]);}
-  return{supply:{low:ldeck.slice(li),high:hdeck.slice(hi)},vis:{low:[...lset],high:[...hset]}};
+  // Flip cards until 5 unique types visible; duplicates stack on top of existing slot
+  function pickVisible(d){
+    const slots=[], supply=[];
+    d.forEach(id=>{
+      const slot=slots.find(s=>s.id===id);
+      if(slot){ slot.count++; }           // duplicate — stack it
+      else if(slots.length<5){ slots.push({id,count:1}); } // new type — new slot
+      else{ supply.push(id); }             // 5 unique types already shown — goes to supply
+    });
+    return{vis:slots,supply};
+  }
+  const l=pickVisible(ldeck), h=pickVisible(hdeck);
+  return{supply:{low:l.supply,high:h.supply},vis:{low:l.vis,high:h.vis}};
 }
 function buildLmPool(){
-  const ids=LANDMARKS.map(l=>l.id).filter(id=>id!=='loan_office');
+  // All 20 landmarks are available — loan_office shown conditionally via render logic
+  const ids=LANDMARKS.map(l=>l.id);
   for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}
-  // pick 5 random + loan office = 6 total (loan office shown conditionally)
-  const pool=ids.slice(0,5);
-  pool.push('loan_office');
-  return pool;
+  return ids;
 }
 function initPlayer(name,color){return{name,color,coins:5,ests:{},landmarks:[],lmCount:0};}
 
@@ -639,15 +646,15 @@ async function startGame(){
   const market=buildMarket(deck);
   const lmPool=buildLmPool();
   const players=room.players.map(p=>initPlayer(p.name,p.color));
-  const startIdx=Math.floor(Math.random()*players.length);
   const newGs={
-    players,market,lmPool,curIdx:startIdx,
-    phase:'init',initIdx:startIdx,initRoundsLeft:3,
+    players,market,lmPool,curIdx:0,
+    phase:'firstroll',initIdx:0,initRoundsLeft:3,
+    firstRolls:{},       // {playerName: roll} — collected as each player rolls
+    firstRollIdx:0,      // whose turn it is to roll for first player
     log:[],lastAction:Date.now(),lastDice:null,lastTotal:null
   };
-  newGs.log.push({msg:`🎲 Game started! ${players[startIdx].name} goes first (randomly chosen)!`,cls:'log-sys'});
-  newGs.log.push({msg:'3 initial building rounds — each player picks 1 establishment.',cls:'log-sys'});
-  newGs.log.push({msg:`${players[startIdx].name}: choose an establishment to buy.`,cls:'log-sys'});
+  newGs.log.push({msg:'🎲 Game started! Each player rolls 1 die — highest roll goes first!',cls:'log-sys'});
+  newGs.log.push({msg:`${players[0].name}: roll the die!`,cls:'log-sys'});
   room.status='playing';room.gameState=newGs;room.lastUpdate=Date.now();
   await saveRoom(roomCode,room);
   enterGame(room);
@@ -826,7 +833,15 @@ function renderTopBar(){
 function renderBanner(){
   const b=document.getElementById('pbanner');
   b.style.display='block';
-  if(gs.phase==='init'){
+  if(gs.phase==='firstroll'){
+    const rollers=gs.players;
+    const doneCount=Object.keys(gs.firstRolls||{}).length;
+    const cur=rollers[gs.firstRollIdx||0];
+    const isMe=cur&&cur.name===myName;
+    b.className='pbanner roll';
+    if(isMe){b.textContent='🎲 Roll to see who goes first!';}
+    else{b.textContent=`⏳ Waiting for ${cur?cur.name:'...'} to roll (${doneCount}/${rollers.length} rolled)`;}
+  }else if(gs.phase==='init'){
     const rd=4-gs.initRoundsLeft;
     b.className='pbanner init';
     b.textContent=`🏗️ Initial Building Round ${rd}/3 — ${isMyTurn()?'Click an establishment below to buy it!':gs.players[gs.initIdx].name+' is choosing...'}`;
@@ -841,8 +856,34 @@ function renderBanner(){
 
 function renderDice(){
   const rb=document.getElementById('rollbtns'),pb=document.getElementById('postbtns');
+  const b1=document.getElementById('b1die'), b2=document.getElementById('b2dice');
   if(gs.phase==='init'){rb.style.display='none';pb.style.display='none';document.getElementById('dtotal').textContent='';document.getElementById('dhint').textContent='No dice in initial building';return;}
+  if(gs.phase==='firstroll'){
+    pb.style.display='none';
+    b1.style.display='block'; b2.style.display='none';
+    const myRoll=(gs.firstRolls||{})[myName];
+    const cur=gs.players[gs.firstRollIdx||0];
+    const isMyTurnToRoll=cur&&cur.name===myName&&!myRoll;
+    if(isMyTurnToRoll){
+      rb.style.display='flex';
+      b1.disabled=false;
+      document.getElementById('dhint').textContent='Roll 1 die to determine who goes first!';
+      document.getElementById('dtotal').textContent='';
+    } else {
+      rb.style.display='none';
+      if(myRoll){
+        document.getElementById('die1').className='die'; document.getElementById('die1').textContent=myRoll;
+        document.getElementById('die2').className='die empty'; document.getElementById('die2').textContent='?';
+        document.getElementById('dtotal').textContent='Your roll: '+myRoll;
+        document.getElementById('dhint').textContent='Waiting for others to roll...';
+      } else {
+        document.getElementById('dhint').textContent='Waiting for '+( cur?cur.name:'...')+' to roll...';
+      }
+    }
+    return;
+  }
   if(!isMyTurn()){rb.style.display='none';pb.style.display='none';if(gs.lastDice)showDice(gs.lastDice,false);return;}
+  b1.style.display='block'; b2.style.display='block';
   if(gs.phase==='roll'){rb.style.display='flex';pb.style.display='none';document.getElementById('dhint').textContent='Choose 1 or 2 dice';}
   else{rb.style.display='none';pb.style.display='flex';if(gs.lastDice)showDice(gs.lastDice,false);}
 }
@@ -886,12 +927,13 @@ function showDice(dice,anim){
 function renderMarket(){
   const gLow=document.getElementById('mgrid-low');
   const gHigh=document.getElementById('mgrid-high');
+  if(gs.phase==='firstroll'){gLow.innerHTML='';gHigh.innerHTML='';return;}
   gLow.innerHTML='';gHigh.innerHTML='';
   const player=myP();
   const myTurn=isMyTurn();
   const initMode=gs.phase==='init'&&myTurn&&!gs._buying;
   const buyMode=gs.phase==='buy'&&myTurn&&!boughtThisTurn;
-  function makeCard(eid){
+  function makeCard(eid,stackCount){
     const e=getE(eid);if(!e)return null;
     const affordable=player.coins>=e.cost;
     const canBuy=(initMode||buyMode)&&affordable;
@@ -903,6 +945,8 @@ function renderMarket(){
     const tag=tagLabels[e.type]||'';
     const div=document.createElement('div');
     div.className='ecard'+(canBuy?' buyable':'')+(cantAff?' cantaff':'')+((!initMode&&!buyMode)?' notturn':'');
+    var stackBadge=stackCount>1?'<div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);color:#fff;font-size:.68rem;font-weight:900;border-radius:6px;padding:2px 7px;">×'+stackCount+'</div>':'';
+    div.style.position='relative';
     div.innerHTML='<div class="ec-banner '+bannerClass+'">'
       +'<div class="ec-top-row"><span class="ec-roll">🎲 ['+e.roll.join(',')+']</span><span class="ec-icon">'+e.icon+'</span></div>'
       +'<div class="ec-name">'+e.name+'</div>'
@@ -912,12 +956,13 @@ function renderMarket(){
       +'<div class="ec-footer">'
       +'<span class="ec-cost '+costClass+'">🪙 '+e.cost+'</span>'
       +'<span class="ec-tag '+tagClass+'">'+tag+'</span>'
-      +'</div></div>';
+      +'</div></div>'
+      +stackBadge;
     if(canBuy)div.onclick=(function(id){return function(){initMode?buyInit(id):buyEst(id);};})(eid);
     return div;
   }
-  (gs.market.vis.low||[]).forEach(function(eid){var c=makeCard(eid);if(c)gLow.appendChild(c);});
-  (gs.market.vis.high||[]).forEach(function(eid){var c=makeCard(eid);if(c)gHigh.appendChild(c);});
+  (gs.market.vis.low||[]).forEach(function(slot){var c=makeCard(slot.id,slot.count);if(c)gLow.appendChild(c);});
+  (gs.market.vis.high||[]).forEach(function(slot){var c=makeCard(slot.id,slot.count);if(c)gHigh.appendChild(c);});
   if(!gLow.innerHTML)gLow.innerHTML='<div style="color:var(--mid);font-size:.9rem;font-weight:700;">Deck empty</div>';
   if(!gHigh.innerHTML)gHigh.innerHTML='<div style="color:var(--mid);font-size:.9rem;font-weight:700;">Deck empty</div>';
   var dcLow=document.getElementById('deck-low-count');
@@ -933,7 +978,7 @@ function renderMarket(){
 
 function renderLandmarks(){
   const lmSection=document.getElementById('lm-section');
-  if(gs.phase==='init'){lmSection.style.display='none';return;}
+  if(gs.phase==='init'||gs.phase==='firstroll'){lmSection.style.display='none';return;}
   lmSection.style.display='block';
   const grid=document.getElementById('mlm');grid.innerHTML='';
   const player=myP();
@@ -965,7 +1010,7 @@ function renderLandmarks(){
       +'<div class="lm-body">'
       +'<div class="lm-eff">'+lm.eff+'</div>'
       +'<div class="lm-costs-row">'
-      +lm.costs.map((c,i)=>'<div class="lm-cost-item"><span>'+['1st','2nd','3rd'][i]+'</span><span>🪙 '+(c||'—')+'</span></div>').join('')
+      +lm.costs.map((c,i)=>'<div class="lm-cost-item"><span>'+['1st','2nd','3rd'][i]+'</span><span>'+(c!=null&&c!==undefined?(c===0?'Free':'🪙 '+c):'—')+'</span></div>').join('')
       +'</div>'
       +'<div class="lm-footer">'
       +'<span class="lm-build">Build: 🪙'+cost+'</span>'
@@ -1110,8 +1155,110 @@ function advanceInit(){
   boughtThisTurn=false;
 }
 
+// ── FIRST ROLL (determine who goes first) ──
+async function rollDice(nd){
+  // If in firstroll phase, hijack to do the first-player determination roll
+  if(gs.phase==='firstroll'){
+    const cur=gs.players[gs.firstRollIdx||0];
+    if(!cur||cur.name!==myName)return;
+    if((gs.firstRolls||{})[myName])return; // already rolled
+    document.getElementById('b1die').disabled=true;
+    const val=Math.ceil(Math.random()*6);
+    showDice([val],true);
+    if(!gs.firstRolls)gs.firstRolls={};
+    gs.firstRolls[myName]=val;
+    gs.log.push({msg:`${myName} rolled a ${val}!`,cls:'log-you'});
+    // Advance to next player
+    const nextIdx=(gs.firstRollIdx||0)+1;
+    if(nextIdx>=gs.players.length){
+      // All players have rolled — find winner
+      setTimeout(async()=>{
+        await resolveFirstRolls();
+      },1200);
+    } else {
+      gs.firstRollIdx=nextIdx;
+      gs.log.push({msg:`${gs.players[nextIdx].name}: roll the die!`,cls:'log-sys'});
+      await push(); render(); syncLog();
+    }
+    await push(); render(); syncLog();
+    return;
+  }
+}
+
+async function resolveFirstRolls(){
+  const rolls=gs.firstRolls||{};
+  const maxRoll=Math.max(...Object.values(rolls));
+  const winners=gs.players.filter(p=>rolls[p.name]===maxRoll);
+  if(winners.length>1){
+    // Tie — reset only tied players and re-roll
+    gs.log.push({msg:`🔁 Tie between ${winners.map(p=>p.name).join(' & ')} (both rolled ${maxRoll})! Re-rolling...`,cls:'log-sys'});
+    const tiedNames=new Set(winners.map(p=>p.name));
+    // Keep non-tied rolls, reset tied ones
+    gs.players.forEach(p=>{ if(tiedNames.has(p.name)) delete gs.firstRolls[p.name]; });
+    // Set firstRollIdx to the first tied player
+    gs.firstRollIdx=gs.players.findIndex(p=>tiedNames.has(p.name));
+    gs.log.push({msg:`${gs.players[gs.firstRollIdx].name}: re-roll!`,cls:'log-sys'});
+    await push(); render(); syncLog();
+    return;
+  }
+  // Clear winner — start the game
+  const startIdx=gs.players.findIndex(p=>p.name===winners[0].name);
+  gs.log.push({msg:`🏆 ${winners[0].name} rolled the highest (${maxRoll}) and goes first!`,cls:'log-sys'});
+  gs.log.push({msg:'🏗️ 3 initial building rounds — each player picks 1 establishment.',cls:'log-sys'});
+  gs.log.push({msg:`${gs.players[startIdx].name}: choose an establishment to buy.`,cls:'log-sys'});
+  gs.phase='init';
+  gs.curIdx=startIdx;
+  gs.initIdx=startIdx;
+  gs.firstRolls={};
+  await push(); render(); syncLog();
+}
+
+// ── FIRST ROLL (determine who goes first) ──
+async function doFirstRoll(){
+  if(gs.phase!=='firstroll')return;
+  const cur=gs.players[gs.firstRollIdx||0];
+  if(!cur||cur.name!==myName)return;
+  if((gs.firstRolls||{})[myName])return;
+  const val=Math.ceil(Math.random()*6);
+  showDice([val],true);
+  if(!gs.firstRolls)gs.firstRolls={};
+  gs.firstRolls[myName]=val;
+  gs.log.push({msg:`${myName} rolled a ${val}!`,cls:'log-you'});
+  const nextIdx=(gs.firstRollIdx||0)+1;
+  if(nextIdx>=gs.players.length){
+    await push(); render(); syncLog();
+    setTimeout(async()=>{ await resolveFirstRolls(); },1200);
+  } else {
+    gs.firstRollIdx=nextIdx;
+    gs.log.push({msg:`${gs.players[nextIdx].name}: roll the die!`,cls:'log-sys'});
+    await push(); render(); syncLog();
+  }
+}
+
+async function resolveFirstRolls(){
+  const rolls=gs.firstRolls||{};
+  const maxRoll=Math.max(...Object.values(rolls));
+  const winners=gs.players.filter(p=>rolls[p.name]===maxRoll);
+  if(winners.length>1){
+    gs.log.push({msg:`🔁 Tie between ${winners.map(p=>p.name).join(' & ')} (both rolled ${maxRoll})! Re-rolling...`,cls:'log-sys'});
+    const tiedNames=new Set(winners.map(p=>p.name));
+    gs.players.forEach(p=>{ if(tiedNames.has(p.name)) delete gs.firstRolls[p.name]; });
+    gs.firstRollIdx=gs.players.findIndex(p=>tiedNames.has(p.name));
+    gs.log.push({msg:`${gs.players[gs.firstRollIdx].name}: re-roll!`,cls:'log-sys'});
+    await push(); render(); syncLog();
+    return;
+  }
+  const startIdx=gs.players.findIndex(p=>p.name===winners[0].name);
+  gs.log.push({msg:`🏆 ${winners[0].name} rolled highest (${maxRoll}) and goes first!`,cls:'log-sys'});
+  gs.log.push({msg:'🏗️ 3 initial building rounds — each player picks 1 establishment.',cls:'log-sys'});
+  gs.log.push({msg:`${gs.players[startIdx].name}: choose an establishment to buy.`,cls:'log-sys'});
+  gs.phase='init'; gs.curIdx=startIdx; gs.initIdx=startIdx; gs.firstRolls={};
+  await push(); render(); syncLog();
+}
+
 // ── ROLL ──
 async function rollDice(nd){
+  if(gs.phase==='firstroll'){await doFirstRoll();return;}
   if(!isMyTurn()||gs.phase!=='roll')return;
   document.getElementById('b1die').disabled=true;
   document.getElementById('b2dice').disabled=true;
@@ -1243,11 +1390,22 @@ function removeFromMarket(eid){
   const e=getE(eid);const isLow=Math.max(...e.roll)<=6;
   const vis=isLow?gs.market.vis.low:gs.market.vis.high;
   const sup=isLow?gs.market.supply.low:gs.market.supply.high;
-  const idx=vis.indexOf(eid);
-  if(idx!==-1){
-    vis.splice(idx,1);
-    let refilled=false;
-    while(sup.length>0&&!refilled){const n=sup.shift();if(!vis.includes(n)){vis.push(n);refilled=true;}}
+  const slotIdx=vis.findIndex(s=>s.id===eid);
+  if(slotIdx===-1)return;
+  const slot=vis[slotIdx];
+  if(slot.count>1){
+    slot.count--;  // just reduce the stack
+  } else {
+    // Last copy — remove slot and refill from supply
+    vis.splice(slotIdx,1);
+    // Draw from supply until we find a card:
+    // if it matches an existing slot, stack it; if new type, make a new slot
+    while(sup.length>0){
+      const n=sup.shift();
+      const existing=vis.find(s=>s.id===n);
+      if(existing){ existing.count++; break; }  // stacks on existing slot
+      else { vis.push({id:n,count:1}); break; }  // new slot
+    }
   }
 }
 
