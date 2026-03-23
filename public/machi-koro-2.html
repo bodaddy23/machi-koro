@@ -96,7 +96,8 @@ select option{background:#fff;}
 .abtn:hover{filter:brightness(1.1);}
 .abtn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--sky-dark);}
 .abtn:disabled{opacity:.4;cursor:default;transform:none;}
-.abtn.gr{background:var(--green);box-shadow:0 4px 0 var(--green-dark);}
+.abtn.gr{background:var(--green);box-shadow:0 4px 0 var(--green-dark);color:#fff;}
+.abtn.gr:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none;}
 .abtn.sun{background:var(--sun);color:var(--txt);box-shadow:0 4px 0 var(--sun-dark);}
 .abtn.red{background:var(--red);box-shadow:0 4px 0 var(--red-dark);}
 .abtn-blue{background:#cce4ff;color:#000;border:3px solid #1a6bbf;border-radius:10px;padding:.6rem 1.2rem;font-family:var(--font-body);font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .15s;}
@@ -178,6 +179,41 @@ select option{background:#fff;}
 .log-you{color:var(--sky-dark);font-weight:700;}
 .log-sys{color:var(--green-dark);font-weight:700;font-style:italic;}
 .log-bad{color:var(--red-dark);font-weight:700;}
+
+/* INFO PANELS */
+.infopanel{background:#fff;border:0.5px solid var(--panel-b);border-radius:12px;overflow:hidden;margin-bottom:.7rem;}
+.infopanel-hdr{padding:8px 12px 7px;border-bottom:0.5px solid var(--panel-b);display:flex;align-items:center;gap:7px;}
+.infopanel-title{font-size:.8rem;font-weight:800;color:var(--sky-dark);}
+.infopanel-body{padding:8px 12px 10px;}
+.ip-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--panel-b);}
+.ip-row:last-child{border-bottom:none;}
+.ip-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ip-name{font-size:.75rem;font-weight:800;color:var(--txt);min-width:52px;}
+.ip-icons{display:flex;flex-wrap:wrap;gap:4px;}
+.ip-bubble{position:relative;width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ip-bubble.blue{background:#d6eeff;border:1.5px solid #80c0f8;}
+.ip-bubble.green{background:#d4f5e0;border:1.5px solid #70d8a0;}
+.ip-bubble.red{background:#ffe0de;border:1.5px solid #f09898;}
+.ip-bubble.purple{background:#ecdcff;border:1.5px solid #c090f0;}
+.ip-cnt{position:absolute;top:-5px;right:-5px;border-radius:9px;font-size:9px;font-weight:900;padding:1px 4px;min-width:13px;text-align:center;line-height:13px;color:#fff;}
+.ip-cnt.blue{background:#1a6bbf;}
+.ip-cnt.green{background:#1a7a4a;}
+.ip-cnt.red{background:#a82820;}
+.ip-cnt.purple{background:#5c2280;}
+.ir-section{margin-bottom:8px;}
+.ir-section:last-child{margin-bottom:0;}
+.ir-plname{font-size:.72rem;font-weight:800;color:var(--mid);margin-bottom:4px;}
+.ir-table{width:100%;border-collapse:collapse;font-size:.72rem;}
+.ir-table td{padding:3px 4px 3px 0;border-top:0.5px solid var(--panel-b);vertical-align:middle;}
+.ir-table tr:first-child td{border-top:none;}
+.ir-badge{display:inline-block;color:#fff;border-radius:4px;padding:1px 5px;font-size:.65rem;font-weight:900;white-space:nowrap;}
+.ir-badge.blue{background:#1a6bbf;}
+.ir-badge.green{background:#1a7a4a;}
+.ir-badge.red{background:#a82820;}
+.ir-badge.purple{background:#5c2280;}
+.ir-bar-wrap{display:flex;align-items:center;gap:5px;}
+.ir-bar{height:5px;border-radius:3px;min-width:3px;}
+.ir-amt{font-size:.68rem;color:var(--mid);white-space:nowrap;}
 
 /* MODAL */
 .modalbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:1rem;}
@@ -305,7 +341,7 @@ select option{background:#fff;}
           <button class="abtn-blue" id="b1die" onclick="rollDice(1)">Roll 1 Die</button>
           <button class="abtn-orange" id="b2dice" onclick="rollDice(2)">Roll 2 Dice</button>
         </div>
-        <div class="arow" id="postbtns" style="display:none">
+        <div class="arow" id="postbtns">
           <button class="abtn gr" onclick="endTurn()">End Turn ➡️</button>
         </div>
       </div>
@@ -346,6 +382,20 @@ select option{background:#fff;}
       <div>
         <div class="stitle">👥 Other Players</div>
         <div id="oplayers"></div>
+      </div>
+      <div class="infopanel" id="cards-owned-panel">
+        <div class="infopanel-hdr">
+          <span style="font-size:13px;">🃏</span>
+          <span class="infopanel-title">Cards owned</span>
+        </div>
+        <div class="infopanel-body" id="cards-owned-body"></div>
+      </div>
+      <div class="infopanel" id="income-panel">
+        <div class="infopanel-hdr">
+          <span style="font-size:13px;">🎲</span>
+          <span class="infopanel-title">Income per roll</span>
+        </div>
+        <div class="infopanel-body" id="income-body"></div>
       </div>
       <div class="logbox">
         <div class="stitle">📜 Game Log</div>
@@ -823,7 +873,7 @@ function render(){
   const nowMyTurn = isMyTurn() && (gs.phase === 'roll' || gs.phase === 'init');
   if(nowMyTurn && !_lastWasMyTurn) playTurnChime();
   _lastWasMyTurn = nowMyTurn;
-  renderTopBar();renderBanner();renderDice();renderMarket();renderLandmarks();renderSide();
+  renderTopBar();renderBanner();renderDice();renderMarket();renderLandmarks();renderSide();renderInfoPanels();
 }
 
 function renderTopBar(){
@@ -1065,6 +1115,106 @@ function getIncomeStr(eid){
 
 function getTypeIcon(type){
   return {blue:'🔵',green:'🟢',red:'🔴',purple:'🟣'}[type]||'⚪';
+}
+
+function renderInfoPanels(){
+  if(!gs)return;
+  const cardsBody=document.getElementById('cards-owned-body');
+  const incomeBody=document.getElementById('income-body');
+  if(!cardsBody||!incomeBody)return;
+
+  // ── Panel 1: Cards owned (icon bubbles) ──
+  cardsBody.innerHTML='';
+  gs.players.forEach(p=>{
+    const row=document.createElement('div');
+    row.className='ip-row';
+    const dot=document.createElement('div');
+    dot.className='ip-dot';
+    dot.style.background=p.color;
+    const name=document.createElement('div');
+    name.className='ip-name';
+    name.textContent=p.name;
+    const icons=document.createElement('div');
+    icons.className='ip-icons';
+    const ests=p.ests||{};
+    if(!Object.keys(ests).length){
+      const empty=document.createElement('span');
+      empty.style.cssText='font-size:.68rem;color:var(--mid);';
+      empty.textContent='None yet';
+      icons.appendChild(empty);
+    } else {
+      Object.keys(ests).forEach(eid=>{
+        const cnt=ests[eid];if(!cnt)return;
+        const e=getE(eid);if(!e)return;
+        const cl=e.type;
+        const bubble=document.createElement('div');
+        bubble.className='ip-bubble '+cl;
+        bubble.textContent=e.icon;
+        if(cnt>1){
+          const badge=document.createElement('span');
+          badge.className='ip-cnt '+cl;
+          badge.textContent=cnt;
+          bubble.appendChild(badge);
+        }
+        icons.appendChild(bubble);
+      });
+    }
+    row.appendChild(dot);row.appendChild(name);row.appendChild(icons);
+    cardsBody.appendChild(row);
+  });
+
+  // ── Panel 2: Income per roll ──
+  incomeBody.innerHTML='';
+  gs.players.forEach(p=>{
+    const sec=document.createElement('div');
+    sec.className='ir-section';
+    const lbl=document.createElement('div');
+    lbl.className='ir-plname';
+    lbl.style.color=p.color;
+    lbl.textContent=p.name;
+    sec.appendChild(lbl);
+    const table=document.createElement('table');
+    table.className='ir-table';
+    const ests=p.ests||{};
+    let hasRows=false;
+    // Sort by roll number
+    const estList=Object.keys(ests).map(eid=>({eid,cnt:ests[eid],e:getE(eid)})).filter(x=>x.e&&x.cnt>0);
+    estList.sort((a,b)=>a.e.roll[0]-b.e.roll[0]);
+    estList.forEach(({eid,cnt,e})=>{
+      hasRows=true;
+      const cl=e.type;
+      const rollStr=e.roll.length>1?e.roll[0]+'–'+e.roll[e.roll.length-1]:String(e.roll[0]);
+      // Income calculation
+      let incAmt=0,incLabel='',isNeg=false;
+      if(cl==='red'){
+        const take=eid==='sushi_bar'?3:2;
+        incAmt=take*cnt; incLabel='takes '+incAmt; isNeg=true;
+      } else if(cl==='blue'||cl==='green'){
+        const base={wheat_field:1,vineyard:2,flower_gdn:2,forest:2,corn_field:3,apple_orch:3,mine:6,bakery:2,convenience:3,flower_shop:0,furniture:0,winery:0,food_wh:0}[eid]||0;
+        if(base>0){incAmt=base*cnt;incLabel='🪙 +'+incAmt;}
+        else{incLabel='variable';}
+      } else if(cl==='purple'){
+        incLabel='special';
+      }
+      const barW=Math.min(60,incAmt*4)||8;
+      const barColor={blue:'#1a6bbf',green:'#1a7a4a',red:'#a82820',purple:'#5c2280'}[cl]||'#1a6bbf';
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td style="width:48px"><span class="ir-badge '+cl+'">'+rollStr+'</span></td>'
+        +'<td style="max-width:100px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">'+e.name+(cnt>1?' ×'+cnt:'')+'</td>'
+        +'<td><div class="ir-bar-wrap">'
+        +(incAmt>0?'<div class="ir-bar" style="width:'+barW+'px;background:'+barColor+'"></div>':'')
+        +'<span class="ir-amt'+(isNeg?' style="color:#a82820"':'')+'">'+incLabel+'</span>'
+        +'</div></td>';
+      table.appendChild(tr);
+    });
+    if(!hasRows){
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td colspan="3" style="color:var(--mid);font-size:.68rem;padding:2px 0">No cards yet</td>';
+      table.appendChild(tr);
+    }
+    sec.appendChild(table);
+    incomeBody.appendChild(sec);
+  });
 }
 
 function renderSide(){
