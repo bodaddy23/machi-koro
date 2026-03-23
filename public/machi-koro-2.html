@@ -468,31 +468,31 @@ select option{background:#fff;}
   <div class="gbody">
     <div class="main">
       <div id="pbanner" class="pbanner" style="display:none"></div>
-      <div>
-      <div class="dpanel" style="margin-bottom:.8rem;">
-        <div class="stitle">🎲 Dice</div>
-        <div class="dice-row">
-          <div class="die empty" id="die1">?</div>
-          <div class="die empty" id="die2">?</div>
+      <div style="display:flex;gap:.9rem;align-items:flex-start;margin-bottom:1.1rem;flex-wrap:wrap;">
+        <div class="dpanel" style="margin-bottom:0;flex-shrink:0;">
+          <div class="stitle">🎲 Dice</div>
+          <div class="dice-row">
+            <div class="die empty" id="die1">?</div>
+            <div class="die empty" id="die2">?</div>
+          </div>
+          <div class="dtotal" id="dtotal"></div>
+          <div class="dhint" id="dhint"></div>
+          <div class="arow" id="rollbtns">
+            <button class="abtn-blue" id="b1die" onclick="rollDice(1)">Roll 1 Die</button>
+            <button class="abtn-orange" id="b2dice" onclick="rollDice(2)">Roll 2 Dice</button>
+          </div>
+          <div class="arow" id="postbtns">
+            <button class="abtn gr" onclick="endTurn()">End Turn ➡️</button>
+          </div>
         </div>
-        <div class="dtotal" id="dtotal"></div>
-        <div class="dhint" id="dhint"></div>
-        <div class="arow" id="rollbtns">
-          <button class="abtn-blue" id="b1die" onclick="rollDice(1)">Roll 1 Die</button>
-          <button class="abtn-orange" id="b2dice" onclick="rollDice(2)">Roll 2 Dice</button>
+        <!-- Income per roll right of dice, natural width only -->
+        <div class="infopanel" id="income-panel-main" style="margin-bottom:0;flex-shrink:0;">
+          <div class="infopanel-hdr">
+            <span style="font-size:13px;">🎲</span>
+            <span class="infopanel-title">Income per roll</span>
+          </div>
+          <div class="infopanel-body" id="income-body-main" style="overflow-x:auto;"></div>
         </div>
-        <div class="arow" id="postbtns">
-          <button class="abtn gr" onclick="endTurn()">End Turn ➡️</button>
-        </div>
-      </div>
-      <!-- Income per roll inline next to dice -->
-      <div class="infopanel" id="income-panel-main" style="flex:1;min-width:200px;margin-bottom:0;" style="margin-bottom:1.1rem;">
-        <div class="infopanel-hdr">
-          <span style="font-size:13px;">🎲</span>
-          <span class="infopanel-title">Income per roll</span>
-        </div>
-        <div class="infopanel-body" id="income-body-main"></div>
-      </div>
       </div>
       <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.4rem;">
         <div class="stitle" style="margin-bottom:0;">🏪 Market</div>
