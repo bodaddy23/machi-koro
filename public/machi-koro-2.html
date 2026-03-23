@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Machi Koro 2</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" onerror="this.remove()">
+<style>
+  /* Fallback fonts if Google Fonts fails to load */
+  @font-face { font-family: 'Fredoka One'; src: local('Georgia'); font-display: swap; }
+</style>
 <style>
 :root {
   --sky:#1a6bbf; --sky-dark:#0e4a8a; --sun:#f7c948; --sun-dark:#c9a000;
@@ -566,17 +570,15 @@ function buildDeck(){
   return d;
 }
 function buildMarket(deck){
-  // Split all copies into low/high buckets
   const ldeck=[],hdeck=[];
   deck.forEach(id=>{const e=getE(id);if(Math.max(...e.roll)<=6)ldeck.push(id);else hdeck.push(id);});
-  // Flip cards until 5 unique types visible; duplicates stack on top of existing slot
+  // Initial setup: show exactly 1 of each unique type (5 slots), rest to supply
+  // During refill (removeFromMarket), duplicates of visible cards will stack
   function pickVisible(d){
-    const slots=[], supply=[];
+    const slots=[], supply=[], seen=new Set();
     d.forEach(id=>{
-      const slot=slots.find(s=>s.id===id);
-      if(slot){ slot.count++; }           // duplicate — stack it
-      else if(slots.length<5){ slots.push({id,count:1}); } // new type — new slot
-      else{ supply.push(id); }             // 5 unique types already shown — goes to supply
+      if(!seen.has(id)&&slots.length<5){ seen.add(id); slots.push({id,count:1}); }
+      else{ supply.push(id); }
     });
     return{vis:slots,supply};
   }
@@ -584,10 +586,11 @@ function buildMarket(deck){
   return{supply:{low:l.supply,high:h.supply},vis:{low:l.vis,high:h.vis}};
 }
 function buildLmPool(){
-  // All 20 landmarks are available — loan_office shown conditionally via render logic
+  // Shuffle all 20 landmarks into a deck
   const ids=LANDMARKS.map(l=>l.id);
   for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}
-  return ids;
+  // Show first 5 as visible, rest in landmark supply deck
+  return{vis:ids.slice(0,5), supply:ids.slice(5)};
 }
 function initPlayer(name,color){return{name,color,coins:5,ests:{},landmarks:[],lmCount:0};}
 
@@ -971,7 +974,8 @@ function renderMarket(){
   var dcLmLbl=document.getElementById('deck-lm-label');
   if(dcLow)dcLow.textContent=(gs.market.supply.low||[]).length;
   if(dcHigh)dcHigh.textContent=(gs.market.supply.high||[]).length;
-  if(dcLm)dcLm.textContent=(gs.lmPool||[]).length;
+  const lmSupplyCount=gs.lmPool&&gs.lmPool.supply?gs.lmPool.supply.length:(gs.lmPool?gs.lmPool.length:0);
+  if(dcLm)dcLm.textContent=lmSupplyCount;
   if(dcLmLbl)dcLmLbl.textContent='in pool';
 }
 
@@ -983,7 +987,7 @@ function renderLandmarks(){
   const grid=document.getElementById('mlm');grid.innerHTML='';
   const player=myP();
   // Only show landmarks NOT yet built by this player
-  (gs.lmPool||[]).forEach(lid=>{
+  ((gs.lmPool&&gs.lmPool.vis)||gs.lmPool||[]).forEach(lid=>{
     const lm=getL(lid);if(!lm)return;
     if(hasLm(player,lid))return; // already built — shown in My City instead
     const cost=lmCost(player,lid);
@@ -1216,9 +1220,11 @@ async function resolveFirstRolls(){
 // ── FIRST ROLL (determine who goes first) ──
 async function doFirstRoll(){
   if(gs.phase!=='firstroll')return;
+  // Check it's my turn: either firstRollIdx points to me, OR I haven't rolled yet
+  // and a previous player's roll hasn't synced yet (be lenient)
   const cur=gs.players[gs.firstRollIdx||0];
   if(!cur||cur.name!==myName)return;
-  if((gs.firstRolls||{})[myName])return;
+  if(gs.firstRolls&&gs.firstRolls[myName])return; // already rolled
   const val=Math.ceil(Math.random()*6);
   showDice([val],true);
   if(!gs.firstRolls)gs.firstRolls={};
@@ -1432,16 +1438,22 @@ async function buildLm(lid){
   if(!player.landmarks)player.landmarks=[];
   player.landmarks.push(lid);
   player.lmCount=(player.lmCount||0)+1;
+  // Remove from visible pool
+  if(gs.lmPool&&gs.lmPool.vis){
+    const vi=gs.lmPool.vis.indexOf(lid);
+    if(vi!==-1)gs.lmPool.vis.splice(vi,1);
+  } else if(Array.isArray(gs.lmPool)){
+    const vi=gs.lmPool.indexOf(lid);
+    if(vi!==-1)gs.lmPool.splice(vi,1);
+  }
   boughtThisTurn=true;
   gs.log.push({msg:`${myName} built ${lm.name} (🪙${cost})! 🏛️ ${player.lmCount}/3`,cls:'log-you'});
 
-  // Refill pool: add a new landmark that isn't already in the pool
-  const allLmIds=LANDMARKS.map(l=>l.id).filter(id=>id!=='loan_office');
-  const available=allLmIds.filter(id=>!(gs.lmPool||[]).includes(id));
-  if(available.length>0){
-    const pick=available[Math.floor(Math.random()*available.length)];
-    gs.lmPool.push(pick);
-    gs.log.push({msg:`New landmark available: ${getL(pick).name}!`,cls:'log-sys'});
+  // Refill visible landmarks from supply
+  if(gs.lmPool&&gs.lmPool.supply&&gs.lmPool.supply.length>0){
+    const next=gs.lmPool.supply.shift();
+    gs.lmPool.vis.push(next);
+    gs.log.push({msg:`New landmark available: ${getL(next).name}!`,cls:'log-sys'});
   }
 
   // Immediate landmark effects
