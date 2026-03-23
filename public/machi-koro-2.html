@@ -1147,7 +1147,7 @@ function renderMarket(){
     const tag=tagLabels[e.type]||'';
     const div=document.createElement('div');
     div.className='ecard ec-type-'+e.type+(canBuy?' buyable':'')+(cantAff?' cantaff':'')+((!initMode&&!buyMode)?' notturn':'');
-    var stackBadge=stackCount>1?'<div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);color:#fff;font-size:.68rem;font-weight:900;border-radius:6px;padding:2px 7px;">×'+stackCount+'</div>':'';
+    var stackBadge=stackCount>1?'<div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.55);color:#fff;font-size:.68rem;font-weight:900;border-radius:6px;padding:2px 7px;white-space:nowrap;z-index:2;">×'+stackCount+'</div>':'';
     div.style.position='relative';
     div.innerHTML='<div class="ec-banner '+bannerClass+'">'
       +'<div class="ec-top-row"><span class="ec-roll">🎲 ['+e.roll.join(',')+']</span><span class="ec-icon">'+e.icon+'</span></div>'
@@ -1416,9 +1416,9 @@ function renderSide(){
       const lm=getL(lid);if(!lm)return;
       const div=document.createElement('div');
       div.className='mpill blue';
-      div.style.cssText='display:flex;flex-direction:column;gap:1px;min-width:90px;background:#fffbe0;border-color:var(--sun);';
+      div.style.cssText='display:flex;flex-direction:column;gap:2px;width:100%;background:#fffbe0;border-color:var(--sun);padding:.4rem .7rem;';
       div.innerHTML='<span style="font-weight:800;font-size:.88rem;">🏛️ '+lm.name+'</span>'
-        +'<span style="font-size:.68rem;opacity:.9;">'+lm.eff.substring(0,40)+(lm.eff.length>40?'...':'')+'</span>';
+        +'<span style="font-size:.68rem;opacity:.9;line-height:1.4;display:block;margin-top:2px;">'+lm.eff+'</span>';
       lmGrid.appendChild(div);
     });
     if(!(p.landmarks||[]).length) lmGrid.innerHTML='<span style="color:var(--mid);font-size:.8rem;">None yet</span>';
@@ -1462,7 +1462,10 @@ function renderSide(){
     let lmHtml='';
     (p2.landmarks||[]).forEach(lid=>{
       const lm=getL(lid);if(!lm)return;
-      lmHtml+='<div style="font-size:.7rem;font-weight:700;color:var(--sun-dark);background:#fffbe0;border:1.5px solid var(--sun);border-radius:6px;padding:2px 6px;margin:.1rem .1rem 0 0;">🏛️ '+lm.name+'</div>';
+      lmHtml+='<div style="font-size:.7rem;font-weight:700;color:var(--sun-dark);background:#fffbe0;border:1.5px solid var(--sun);border-radius:6px;padding:4px 7px;margin:.2rem 0 0 0;width:100%;display:flex;flex-direction:column;gap:2px;">'
+        +'<span>🏛️ '+lm.name+'</span>'
+        +'<span style="font-size:.65rem;font-weight:600;color:var(--mid);line-height:1.35;">'+lm.eff+'</span>'
+        +'</div>';
     });
     d.innerHTML='<div class="opname" style="color:'+p2.color+';">'+p2.name+(act?' ⭐':'')+'</div>'
       +'<div class="opinfo">🪙 '+p2.coins+' | 🏛️ '+(p2.lmCount||0)+'/3</div>'
