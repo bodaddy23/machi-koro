@@ -270,25 +270,24 @@ select option{background:#fff;}
 .ec-tag-red{background:#fff0ef;color:#a82820;}.ec-tag-purple{background:#f5eeff;color:#5c2280;}
 
 /* LANDMARKS */
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem;margin-bottom:1.1rem;}
-.lcard{border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(0,0,0,.15);border:3px solid transparent;transition:transform .15s,box-shadow .15s;cursor:default;}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:.75rem;margin-bottom:1.1rem;}
+.lcard{border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(0,0,0,.15);border:3px solid transparent;transition:transform .15s,box-shadow .15s;cursor:default;background:#fff;}
 .lcard.buildable{border-color:var(--sun);cursor:pointer;}
 .lcard.buildable:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.22);}
-.lm-banner{padding:9px 10px 8px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;}
-.lm-banner.lm-gold{background:linear-gradient(135deg,#7a5800,#c89010);}
+.lm-banner{background:linear-gradient(135deg,#7a5800,#c89010);padding:9px 10px 8px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;}
 .lm-banner.lm-launchpad{background:linear-gradient(135deg,#a82820,#e8423a);}
 .lm-top-row{display:flex;align-items:center;justify-content:space-between;}
 .lm-badge{font-size:.62rem;font-weight:900;color:rgba(255,255,255,.9);background:rgba(0,0,0,.22);border-radius:4px;padding:2px 5px;letter-spacing:.06em;text-transform:uppercase;}
 .lm-icon{font-size:1.4rem;line-height:1;}
 .lm-name{font-size:.9rem;font-weight:900;color:#fff;line-height:1.2;margin-top:3px;}
 .lm-body{padding:8px 10px 9px;flex:1;display:flex;flex-direction:column;background:#fff;}
-.lm-eff{font-size:.68rem;color:#444;line-height:1.35;font-weight:700;flex:1;margin-bottom:7px;}
-.lm-costs-row{display:flex;flex-direction:column;gap:2px;margin-bottom:7px;}
+.lm-eff{font-size:.68rem;color:#444;line-height:1.35;font-weight:700;flex:1;margin-bottom:6px;}
+.lm-costs-row{display:flex;flex-direction:column;gap:2px;margin-bottom:6px;}
 .lm-cost-item{display:flex;justify-content:space-between;align-items:center;font-size:.67rem;}
 .lm-cost-label{color:#888;font-weight:700;}
-.lm-cost-val{font-weight:900;color:#1a6bbf;display:flex;align-items:center;gap:2px;}
+.lm-cost-val{font-weight:900;color:#1a6bbf;}
 .lm-footer{display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1.5px solid #eee;}
-.lm-build{font-size:.88rem;font-weight:900;color:#1a6bbf;display:flex;align-items:center;gap:3px;}
+.lm-build{font-size:.9rem;font-weight:900;color:#1a6bbf;}
 .lm-scope{font-size:.62rem;font-weight:800;border-radius:4px;padding:2px 6px;white-space:nowrap;}
 .lm-scope-all{background:#fff8e0;color:#8a6200;}
 .lm-scope-builder{background:#f0e8ff;color:#5c2280;}
@@ -1201,15 +1200,14 @@ function renderLandmarks(){
       park:'🌳',publisher:'📰',radio_tower:'📡',tv_station:'📺',launch_pad:'🚀'}[lid]||'🏛️';
     const costsHtml=lm.costs.map((c,i)=>{
       const lbl=['1st','2nd','3rd'][i];
-      const hasVal=(c!=null&&c!==undefined&&c!==0);
-      const valHtml=hasVal?'<span>🪙</span><span>'+c+'</span>':'<span style="color:#aaa">—</span>';
+      const val=(c!=null&&c!==0)?'🪙 '+c:'<span style="color:#bbb">—</span>';
       return '<div class="lm-cost-item">'
         +'<span class="lm-cost-label">'+lbl+'</span>'
-        +'<span class="lm-cost-val">'+valHtml+'</span>'
+        +'<span class="lm-cost-val">'+val+'</span>'
         +'</div>';
     }).join('');
     div.innerHTML=''
-      +'<div class="lm-banner '+(isLaunchPad?'lm-launchpad':'lm-gold')+'">'
+      +'<div class="lm-banner '+(isLaunchPad?'lm-launchpad':'')+'">'
         +'<div class="lm-top-row">'
           +'<span class="lm-badge">LANDMARK</span>'
           +'<span class="lm-icon">'+icon+'</span>'
@@ -1220,7 +1218,7 @@ function renderLandmarks(){
         +'<div class="lm-eff">'+lm.eff+'</div>'
         +'<div class="lm-costs-row">'+costsHtml+'</div>'
         +'<div class="lm-footer">'
-          +'<div class="lm-build"><span>🪙</span><span>'+cost+'</span></div>'
+          +'<span class="lm-build">🪙 '+cost+'</span>'
           +'<span class="lm-scope '+scopeClass+'">'+scopeTag+'</span>'
         +'</div>'
       +'</div>'
