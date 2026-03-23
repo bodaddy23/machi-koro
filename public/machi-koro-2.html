@@ -957,14 +957,24 @@ function playTurnChime() {
 function playDiceRollSound(){
   try{
     const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    const buf=ctx.createBuffer(1,ctx.sampleRate*0.55,ctx.sampleRate);
-    const d=buf.getChannelData(0);
-    for(let i=0;i<d.length;i++){d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,0.4)*0.35;}
-    const src=ctx.createBufferSource();src.buffer=buf;
-    const filt=ctx.createBiquadFilter();filt.type='bandpass';filt.frequency.value=900;filt.Q.value=0.8;
-    const gain=ctx.createGain();gain.gain.setValueAtTime(0.5,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.55);
-    src.connect(filt);filt.connect(gain);gain.connect(ctx.destination);
-    src.start();src.stop(ctx.currentTime+0.6);
+    // Multiple short sharp clicks simulating dice tumbling — 6 rapid impacts
+    const clicks=[0.0,0.08,0.18,0.30,0.44,0.58,0.70,0.80];
+    clicks.forEach((t,i)=>{
+      const buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*0.06),ctx.sampleRate);
+      const d=buf.getChannelData(0);
+      // Sharp transient: fast attack, exponential decay
+      for(let j=0;j<d.length;j++){
+        const env=Math.pow(1-j/d.length,2.5);
+        d[j]=(Math.random()*2-1)*env*(0.6-i*0.05);
+      }
+      const src=ctx.createBufferSource();src.buffer=buf;
+      const filt=ctx.createBiquadFilter();
+      filt.type='highpass';filt.frequency.value=800+Math.random()*400;
+      const gain=ctx.createGain();gain.gain.value=0.55-i*0.04;
+      src.connect(filt);filt.connect(gain);gain.connect(ctx.destination);
+      const start=ctx.currentTime+t;
+      src.start(start);src.stop(start+0.07);
+    });
   }catch(e){}
 }
 
@@ -1497,6 +1507,7 @@ function renderSide(){
     sp.className='mpill '+cl;
     sp.style.cssText='display:flex;flex-direction:column;gap:1px;min-width:90px;';
     const isNew=(p.lastBought===eid);
+    if(isNew)sp.style.border='2.5px solid #f7c948';
     sp.innerHTML='<span style="font-weight:800;font-size:.95rem;">'+e.icon+' '+e.name+(cnt>1?' ×'+cnt:'')+(isNew?' ⭐':'')+'</span>'
       +'<span style="font-size:.72rem;opacity:.9;margin-top:1px;">🎲['+e.roll.join(',')+'] '+incomeStr+'</span>';
     grid.appendChild(sp);
@@ -1515,7 +1526,8 @@ function renderSide(){
       const cl={blue:'blue',green:'green',red:'red',purple:'purple'}[e.type]||'blue';
       let incStr=getIncomeStr(eid);
       estHtml+='<div class="mpill '+cl+'" style="display:flex;flex-direction:column;gap:1px;min-width:80px;margin:.2rem .2rem 0 0;">'
-        +'<span style="font-weight:800;font-size:.82rem;">'+e.icon+' '+e.name+(cnt>1?' ×'+cnt:'')+(p2.lastBought===eid?' ⭐':'')+'</span>'
+        +(p2.lastBought===eid?'<div style="font-size:.6rem;background:#f7c948;color:#7a5a00;border-radius:4px;padding:1px 5px;margin-bottom:1px;font-weight:900;">⭐ New</div>':'')
+        +'<span style="font-weight:800;font-size:.82rem;">'+e.icon+' '+e.name+(cnt>1?' ×'+cnt:'')+'</span>'
         +'<span style="font-size:.68rem;opacity:.9;margin-top:1px;">🎲['+e.roll.join(',')+'] '+incStr+'</span>'
         +'</div>';
     });
@@ -1927,6 +1939,7 @@ async function buyEst(eid){
   player.coins-=e.cost;player.ests[eid]=(player.ests[eid]||0)+1;
   animateCardRemoval(eid);
   animateCardRemoval(eid);
+  await new Promise(r=>setTimeout(r,350));
   removeFromMarket(eid);boughtThisTurn=true;
   gs.log.push({msg:`${myName} bought ${e.name} for 🪙${e.cost}`,cls:'log-you'});
   myP().lastBought=eid;
