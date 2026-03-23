@@ -345,9 +345,9 @@ select option{background:#fff;}
 .ir-section:last-child{margin-bottom:0;}
 .ir-plname{font-size:.72rem;font-weight:800;color:var(--mid);margin-bottom:4px;}
 .ig-table{width:100%;border-collapse:collapse;font-size:.72rem;}
-.ig-table th{text-align:center;font-weight:700;font-size:.65rem;color:var(--mid);padding:3px 5px 5px;}
+.ig-table th{text-align:center;font-weight:700;font-size:.62rem;color:var(--mid);padding:3px 4px 5px;white-space:nowrap;}
 .ig-table th.ig-roll-h{background:var(--panel);border-radius:4px;color:var(--sky-dark);}
-.ig-table td{padding:4px 5px;text-align:center;border-top:0.5px solid var(--panel-b);}
+.ig-table td{padding:3px 4px;text-align:center;border-top:0.5px solid var(--panel-b);white-space:nowrap;}
 .ig-table td.ig-roll{font-weight:800;font-size:.68rem;color:var(--mid);background:var(--panel);}
 .ig-pip{display:inline-flex;align-items:center;justify-content:center;border-radius:5px;padding:1px 6px;font-size:.68rem;font-weight:900;white-space:nowrap;}
 .ig-pip-gain{background:#eafff3;color:#1a7a4a;border:0.5px solid #70d8a0;}
@@ -468,8 +468,8 @@ select option{background:#fff;}
   <div class="gbody">
     <div class="main">
       <div id="pbanner" class="pbanner" style="display:none"></div>
-      <div style="display:flex;gap:.8rem;align-items:flex-start;margin-bottom:0;flex-wrap:wrap;">
-      <div class="dpanel" style="margin-bottom:0;flex-shrink:0;">
+      <div>
+      <div class="dpanel" style="margin-bottom:.8rem;">
         <div class="stitle">🎲 Dice</div>
         <div class="dice-row">
           <div class="die empty" id="die1">?</div>
@@ -493,8 +493,7 @@ select option{background:#fff;}
         </div>
         <div class="infopanel-body" id="income-body-main"></div>
       </div>
-      </div><!-- end dice+income flex -->
-      <div style="margin-bottom:1.1rem;"></div>
+      </div>
       <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.4rem;">
         <div class="stitle" style="margin-bottom:0;">🏪 Market</div>
       </div>
@@ -1449,30 +1448,37 @@ function renderInfoPanels(){
     return{net:0,type:'zero'};
   }
 
-  // Build table — assumption: active player = current player (gs.curIdx)
+  // Build table — players as rows, rolls 1-12 as columns
   const curName = gs.players[gs.curIdx]?gs.players[gs.curIdx].name:'';
   const table=document.createElement('table');
   table.className='ig-table';
-  // Header row
+
+  // Header row: empty corner + rolls 1-12
   const thead=document.createElement('thead');
   const hrow=document.createElement('tr');
-  const rth=document.createElement('th'); rth.className='ig-roll-h'; rth.textContent='🎲'; hrow.appendChild(rth);
-  gs.players.forEach(p=>{
+  const corner=document.createElement('th'); corner.className='ig-roll-h'; corner.textContent='Player'; hrow.appendChild(corner);
+  for(let roll=1;roll<=12;roll++){
     const th=document.createElement('th');
-    const dot=document.createElement('span');
-    dot.style.cssText='display:inline-block;width:7px;height:7px;border-radius:50%;background:'+p.color+';margin-right:3px;vertical-align:middle;';
-    th.appendChild(dot);
-    th.appendChild(document.createTextNode(p.name));
+    th.className='ig-roll-h';
+    th.textContent=roll;
     hrow.appendChild(th);
-  });
+  }
   thead.appendChild(hrow); table.appendChild(thead);
 
-  // Data rows for rolls 1–12
+  // One row per player
   const tbody=document.createElement('tbody');
-  for(let roll=1;roll<=12;roll++){
+  gs.players.forEach(p=>{
     const tr=document.createElement('tr');
-    const rtd=document.createElement('td'); rtd.className='ig-roll'; rtd.textContent=roll; tr.appendChild(rtd);
-    gs.players.forEach(p=>{
+    // Player name cell
+    const nameTd=document.createElement('td');
+    nameTd.style.cssText='white-space:nowrap;font-weight:800;font-size:.68rem;';
+    const dot=document.createElement('span');
+    dot.style.cssText='display:inline-block;width:7px;height:7px;border-radius:50%;background:'+p.color+';margin-right:4px;vertical-align:middle;';
+    nameTd.appendChild(dot);
+    nameTd.appendChild(document.createTextNode(p.name));
+    tr.appendChild(nameTd);
+    // One cell per roll
+    for(let roll=1;roll<=12;roll++){
       const td=document.createElement('td');
       const {net,type}=calcRollIncome(p,roll,curName);
       const pip=document.createElement('span');
@@ -1480,9 +1486,9 @@ function renderInfoPanels(){
       else if(type==='take'){pip.className='ig-pip ig-pip-take';pip.textContent=net;}
       else{pip.className='ig-pip-zero';pip.textContent='—';}
       td.appendChild(pip); tr.appendChild(td);
-    });
+    }
     tbody.appendChild(tr);
-  }
+  });
   table.appendChild(tbody);
   incomeBody.appendChild(table);
 }
