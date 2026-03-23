@@ -100,13 +100,13 @@ select option{background:#fff;}
 .abtn.gr:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none;}
 .abtn.sun{background:var(--sun);color:var(--txt);box-shadow:0 4px 0 var(--sun-dark);}
 .abtn.red{background:var(--red);box-shadow:0 4px 0 var(--red-dark);}
-.abtn-blue{background:#cce4ff;color:#000;border:3px solid #1a6bbf;border-radius:10px;padding:.6rem 1.2rem;font-family:var(--font-body);font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .15s;}
-.abtn-blue:hover{background:#b3d4ff;}
-.abtn-blue:active{transform:translateY(1px);}
+.abtn-blue{background:var(--sky);color:#fff;border:none;border-radius:12px;padding:.65rem 1.5rem;font-family:var(--font-display);font-size:1rem;cursor:pointer;box-shadow:0 4px 0 var(--sky-dark);transition:filter .15s,transform .1s;}
+.abtn-blue:hover{filter:brightness(1.1);}
+.abtn-blue:active{transform:translateY(2px);box-shadow:0 2px 0 var(--sky-dark);}
 .abtn-blue:disabled{opacity:.4;cursor:default;transform:none;}
-.abtn-orange{background:#ffe0b2;color:#000;border:3px solid #f7a030;border-radius:10px;padding:.6rem 1.2rem;font-family:var(--font-body);font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .15s;}
-.abtn-orange:hover{background:#ffd090;}
-.abtn-orange:active{transform:translateY(1px);}
+.abtn-orange{background:var(--sun);color:var(--txt);border:none;border-radius:12px;padding:.65rem 1.5rem;font-family:var(--font-display);font-size:1rem;cursor:pointer;box-shadow:0 4px 0 var(--sun-dark);transition:filter .15s,transform .1s;}
+.abtn-orange:hover{filter:brightness(1.05);}
+.abtn-orange:active{transform:translateY(2px);box-shadow:0 2px 0 var(--sun-dark);}
 .abtn-orange:disabled{opacity:.4;cursor:default;transform:none;}
 
 /* MARKET */
@@ -238,13 +238,13 @@ select option{background:#fff;}
 .abtn.gr:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none;}
 .abtn.sun{background:var(--sun);color:var(--txt);box-shadow:0 4px 0 var(--sun-dark);}
 .abtn.red{background:var(--red);box-shadow:0 4px 0 var(--red-dark);}
-.abtn-blue{background:#cce4ff;color:#000;border:3px solid #1a6bbf;border-radius:10px;padding:.6rem 1.2rem;font-family:var(--font-body);font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .15s;}
-.abtn-blue:hover{background:#b3d4ff;}
-.abtn-blue:active{transform:translateY(1px);}
+.abtn-blue{background:var(--sky);color:#fff;border:none;border-radius:12px;padding:.65rem 1.5rem;font-family:var(--font-display);font-size:1rem;cursor:pointer;box-shadow:0 4px 0 var(--sky-dark);transition:filter .15s,transform .1s;}
+.abtn-blue:hover{filter:brightness(1.1);}
+.abtn-blue:active{transform:translateY(2px);box-shadow:0 2px 0 var(--sky-dark);}
 .abtn-blue:disabled{opacity:.4;cursor:default;transform:none;}
-.abtn-orange{background:#ffe0b2;color:#000;border:3px solid #f7a030;border-radius:10px;padding:.6rem 1.2rem;font-family:var(--font-body);font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .15s;}
-.abtn-orange:hover{background:#ffd090;}
-.abtn-orange:active{transform:translateY(1px);}
+.abtn-orange{background:var(--sun);color:var(--txt);border:none;border-radius:12px;padding:.65rem 1.5rem;font-family:var(--font-display);font-size:1rem;cursor:pointer;box-shadow:0 4px 0 var(--sun-dark);transition:filter .15s,transform .1s;}
+.abtn-orange:hover{filter:brightness(1.05);}
+.abtn-orange:active{transform:translateY(2px);box-shadow:0 2px 0 var(--sun-dark);}
 .abtn-orange:disabled{opacity:.4;cursor:default;transform:none;}
 
 /* MARKET */
@@ -1186,7 +1186,12 @@ function renderLandmarks(){
   const grid=document.getElementById('mlm');grid.innerHTML='';
   const player=myP();
   // Only show landmarks NOT yet built by this player
-  ((gs.lmPool&&gs.lmPool.vis)||gs.lmPool||[]).forEach(lid=>{
+  // Build the visible list: 5 from pool + loan_office appended separately
+  const _visBase=(gs.lmPool&&gs.lmPool.vis)||gs.lmPool||[];
+  const _visLms=_visBase.filter(id=>id!=='loan_office');
+  // Always append loan_office so it can show conditionally without stealing a slot
+  if(!_visLms.includes('loan_office'))_visLms.push('loan_office');
+  _visLms.forEach(lid=>{
     const lm=getL(lid);if(!lm)return;
     if(hasLm(player,lid))return; // already built — shown in My City instead
     const cost=lmCost(player,lid);
@@ -1803,9 +1808,20 @@ async function buildLm(lid){
 
   // Refill visible landmarks from supply
   if(gs.lmPool&&gs.lmPool.supply&&gs.lmPool.supply.length>0){
-    const next=gs.lmPool.supply.shift();
-    gs.lmPool.vis.push(next);
-    gs.log.push({msg:`New landmark available: ${getL(next).name}!`,cls:'log-sys'});
+    // Keep drawing until we find a non-loan_office landmark for the visible slot
+    let next=null;
+    const temp=[];
+    while(gs.lmPool.supply.length>0){
+      const candidate=gs.lmPool.supply.shift();
+      if(candidate==='loan_office'){temp.push(candidate);}
+      else{next=candidate;break;}
+    }
+    // Put skipped loan_office cards back at end of supply
+    temp.forEach(c=>gs.lmPool.supply.push(c));
+    if(next){
+      gs.lmPool.vis.push(next);
+      gs.log.push({msg:`New landmark available: ${getL(next).name}!`,cls:'log-sys'});
+    }
   }
 
   // Immediate landmark effects
