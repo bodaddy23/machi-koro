@@ -885,8 +885,8 @@ function renderDice(){
     }
     return;
   }
-  if(!isMyTurn()){rb.style.display='none';pb.style.display='none';if(gs.lastDice)showDice(gs.lastDice,false);return;}
   b1.style.display='block'; b2.style.display='block';
+  if(!isMyTurn()){rb.style.display='none';pb.style.display='none';if(gs.lastDice)showDice(gs.lastDice,false);return;}
   if(gs.phase==='roll'){rb.style.display='flex';pb.style.display='none';document.getElementById('dhint').textContent='Choose 1 or 2 dice';}
   else{rb.style.display='none';pb.style.display='flex';if(gs.lastDice)showDice(gs.lastDice,false);}
 }
@@ -1400,17 +1400,21 @@ function removeFromMarket(eid){
   if(slotIdx===-1)return;
   const slot=vis[slotIdx];
   if(slot.count>1){
-    slot.count--;  // just reduce the stack
+    slot.count--;  // reduce stack, slot stays
   } else {
-    // Last copy — remove slot and refill from supply
+    // Last copy — remove slot and draw from supply to fill it
     vis.splice(slotIdx,1);
-    // Draw from supply until we find a card:
-    // if it matches an existing slot, stack it; if new type, make a new slot
+    // Keep drawing: stack duplicates of existing visible types,
+    // stop when we find a NEW unique type (makes a new slot)
     while(sup.length>0){
       const n=sup.shift();
       const existing=vis.find(s=>s.id===n);
-      if(existing){ existing.count++; break; }  // stacks on existing slot
-      else { vis.push({id:n,count:1}); break; }  // new slot
+      if(existing){
+        existing.count++;  // duplicate — stack it, keep drawing for the new slot
+      } else {
+        vis.push({id:n,count:1});  // new unique type — fills the open slot, stop
+        break;
+      }
     }
   }
 }
