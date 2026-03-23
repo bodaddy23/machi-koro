@@ -270,32 +270,28 @@ select option{background:#fff;}
 .ec-tag-red{background:#fff0ef;color:#a82820;}.ec-tag-purple{background:#f5eeff;color:#5c2280;}
 
 /* LANDMARKS */
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:.9rem;margin-bottom:1.1rem;}
-.lcard{border-radius:16px;border:2px solid #e8d8a0;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.10);display:flex;flex-direction:column;overflow:hidden;transition:transform .15s,box-shadow .15s;cursor:default;}
-.lcard.buildable{border-color:#f7c948;cursor:pointer;}
-.lcard.buildable:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(0,0,0,.18);}
-.lm-banner{padding:11px 13px 12px;display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
-.lm-banner.lm-gold{background:linear-gradient(150deg,#b87c10,#e8b830,#f7d060);}
-.lm-banner.lm-launchpad{background:linear-gradient(150deg,#7a0a0a,#c8302a,#e8423a);}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem;margin-bottom:1.1rem;}
+.lcard{border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(0,0,0,.15);border:3px solid transparent;transition:transform .15s,box-shadow .15s;cursor:default;}
+.lcard.buildable{border-color:var(--sun);cursor:pointer;}
+.lcard.buildable:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.22);}
+.lm-banner{padding:9px 10px 8px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;}
+.lm-banner.lm-gold{background:linear-gradient(135deg,#7a5800,#c89010);}
+.lm-banner.lm-launchpad{background:linear-gradient(135deg,#a82820,#e8423a);}
 .lm-top-row{display:flex;align-items:center;justify-content:space-between;}
-.lm-badge{font-size:.58rem;font-weight:900;color:#fff;background:rgba(0,0,0,.25);border-radius:4px;padding:2px 7px;letter-spacing:.08em;text-transform:uppercase;}
-.lm-icon{font-size:1.5rem;line-height:1;}
-.lm-name{font-family:var(--font-display);font-size:1.05rem;font-weight:900;color:#fff!important;line-height:1.2;margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,.3);}
-.lm-body{padding:11px 13px 12px;flex:1;display:flex;flex-direction:column;background:#fff;}
-.lm-eff{font-size:.74rem;color:#333;line-height:1.45;font-weight:600;flex:1;margin-bottom:10px;}
-.lm-costs-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
-.lm-cost-item{display:flex;align-items:center;justify-content:space-between;font-size:.7rem;}
+.lm-badge{font-size:.62rem;font-weight:900;color:rgba(255,255,255,.9);background:rgba(0,0,0,.22);border-radius:4px;padding:2px 5px;letter-spacing:.06em;text-transform:uppercase;}
+.lm-icon{font-size:1.4rem;line-height:1;}
+.lm-name{font-size:.9rem;font-weight:900;color:#fff;line-height:1.2;margin-top:3px;}
+.lm-body{padding:8px 10px 9px;flex:1;display:flex;flex-direction:column;background:#fff;}
+.lm-eff{font-size:.68rem;color:#444;line-height:1.35;font-weight:700;flex:1;margin-bottom:7px;}
+.lm-costs-row{display:flex;flex-direction:column;gap:2px;margin-bottom:7px;}
+.lm-cost-item{display:flex;justify-content:space-between;align-items:center;font-size:.67rem;}
 .lm-cost-label{color:#888;font-weight:700;}
-.lm-cost-val{display:flex;align-items:center;gap:3px;font-weight:900;color:#1a6bbf;}
-.lm-cost-coin{font-size:.85rem;}
-.lm-footer{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1.5px solid #f0e4c0;margin-top:auto;}
-.lm-build{display:flex;align-items:center;gap:3px;font-size:.8rem;font-weight:900;color:#1a6bbf;}
-.lm-build-label{font-size:.72rem;font-weight:700;color:#555;}
-.lm-build-coin{font-size:.88rem;}
-.lm-build-amt{font-size:.88rem;font-weight:900;color:#1a6bbf;}
-.lm-scope{font-size:.64rem;font-weight:800;border-radius:5px;padding:2px 7px;white-space:nowrap;}
+.lm-cost-val{font-weight:900;color:#1a6bbf;display:flex;align-items:center;gap:2px;}
+.lm-footer{display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1.5px solid #eee;}
+.lm-build{font-size:.88rem;font-weight:900;color:#1a6bbf;display:flex;align-items:center;gap:3px;}
+.lm-scope{font-size:.62rem;font-weight:800;border-radius:4px;padding:2px 6px;white-space:nowrap;}
 .lm-scope-all{background:#fff8e0;color:#8a6200;}
-.lm-scope-builder{background:#ede8ff;color:#5c2280;}
+.lm-scope-builder{background:#f0e8ff;color:#5c2280;}
 
 /* MY CITY SIDE */
 .my-coins-lbl{font-size:.9rem;font-weight:800;color:var(--sky-dark);margin-bottom:.4rem;}
@@ -1203,13 +1199,14 @@ function renderLandmarks(){
       moving_co:'🚛',observatory:'🔭',shop_mall:'🛍️',soda_plant:'🥤',tech_startup:'💻',
       temple:'⛩️',exhibit_hall:'🏢',french_rest:'🍽️',loan_office:'🏦',museum:'🏛️',
       park:'🌳',publisher:'📰',radio_tower:'📡',tv_station:'📺',launch_pad:'🚀'}[lid]||'🏛️';
-    const costsRowHtml=lm.costs.map((c,i)=>{
+    const costsHtml=lm.costs.map((c,i)=>{
       const lbl=['1st','2nd','3rd'][i];
-      const valHtml=(c!=null&&c!==undefined&&c!==0)
-        ?'<span class="lm-cost-coin">🪙</span><span>'+c+'</span>'
-        :(c===0?'<span>Free</span>':'<span style="color:#aaa">—</span>');
-      return '<div class="lm-cost-item"><span class="lm-cost-label">'+lbl+'</span>'
-        +'<span class="lm-cost-val">'+valHtml+'</span></div>';
+      const hasVal=(c!=null&&c!==undefined&&c!==0);
+      const valHtml=hasVal?'<span>🪙</span><span>'+c+'</span>':'<span style="color:#aaa">—</span>';
+      return '<div class="lm-cost-item">'
+        +'<span class="lm-cost-label">'+lbl+'</span>'
+        +'<span class="lm-cost-val">'+valHtml+'</span>'
+        +'</div>';
     }).join('');
     div.innerHTML=''
       +'<div class="lm-banner '+(isLaunchPad?'lm-launchpad':'lm-gold')+'">'
@@ -1221,16 +1218,12 @@ function renderLandmarks(){
       +'</div>'
       +'<div class="lm-body">'
         +'<div class="lm-eff">'+lm.eff+'</div>'
-        +'<div class="lm-costs-row">'+costsRowHtml+'</div>'
+        +'<div class="lm-costs-row">'+costsHtml+'</div>'
         +'<div class="lm-footer">'
-          +'<div class="lm-build">'
-            +'<span class="lm-build-label">Build:</span>'
-            +'<span class="lm-build-coin">🪙</span>'
-            +'<span class="lm-build-amt">'+cost+'</span>'
-          +'</div>'
+          +'<div class="lm-build"><span>🪙</span><span>'+cost+'</span></div>'
           +'<span class="lm-scope '+scopeClass+'">'+scopeTag+'</span>'
         +'</div>'
-      +'</div>';
+      +'</div>'
     if(canBuild)div.onclick=()=>buildLm(lid);
     grid.appendChild(div);
   });
